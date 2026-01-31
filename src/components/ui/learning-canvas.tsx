@@ -15,11 +15,12 @@ import clsx from "clsx";
 
 interface LearningCanvasProps {
     state: LearningState;
+    onLoadMore: (feature: string) => void;
 }
 
-type Tab = "diagram" | "analogy" | "cheat_sheet" | "memory_map" | "quiz" | "sources" | "resources" | "infographic" | "flashcards";
+type Tab = "diagram" | "analogy" | "cheat_sheet" | "memory_map" | "quiz" | "resources" | "infographic" | "flashcards" | "pareto";
 
-export function LearningCanvas({ state }: LearningCanvasProps) {
+export function LearningCanvas({ state, onLoadMore }: LearningCanvasProps) {
     const [activeTab, setActiveTab] = useState<Tab>("diagram");
 
     const tabs = [
@@ -31,6 +32,7 @@ export function LearningCanvas({ state }: LearningCanvasProps) {
         { id: "memory_map", label: "Mental Map", icon: BrainCircuit },
         { id: "quiz", label: "Quick Check", icon: CheckSquare },
         { id: "resources", label: "Resources", icon: Library },
+        { id: "pareto", label: "Pareto (80/20)", icon: Sparkles },
         { id: "sources", label: "Sources", icon: BookOpen },
     ] as const;
 
@@ -68,19 +70,19 @@ export function LearningCanvas({ state }: LearningCanvasProps) {
                     )}
 
                     {activeTab === "infographic" && (
-                        <InfographicView state={state} />
+                        <InfographicView state={state} onLoadMore={() => onLoadMore("infographic")} />
                     )}
 
                     {activeTab === "analogy" && (
-                        <AnalogyView state={state} />
+                        <AnalogyView state={state} onLoadMore={() => onLoadMore("analogy")} />
                     )}
 
                     {activeTab === "cheat_sheet" && (
-                        <CheatSheetView state={state} />
+                        <CheatSheetView state={state} onLoadMore={() => onLoadMore("cheat_sheet")} />
                     )}
 
                     {activeTab === "flashcards" && (
-                        <FlashcardView state={state} />
+                        <FlashcardView state={state} onLoadMore={() => onLoadMore("flashcards")} />
                     )}
 
                     {activeTab === "memory_map" && (
@@ -88,11 +90,15 @@ export function LearningCanvas({ state }: LearningCanvasProps) {
                     )}
 
                     {activeTab === "quiz" && (
-                        <QuizView state={state} />
+                        <QuizView state={state} onLoadMore={() => onLoadMore("quiz")} />
                     )}
 
                     {activeTab === "resources" && (
-                        <ResourcesView state={state} />
+                        <ResourcesView state={state} onLoadMore={() => onLoadMore("resources")} />
+                    )}
+
+                    {activeTab === "pareto" && (
+                        <ParetoView state={state} onLoadMore={() => onLoadMore("pareto")} />
                     )}
 
                     {activeTab === "sources" && (
@@ -153,7 +159,7 @@ function DiagramView({ data }: { data: any }) {
     );
 }
 
-function AnalogyView({ state }: { state: LearningState }) {
+function AnalogyView({ state, onLoadMore }: { state: LearningState, onLoadMore?: (feature: string) => void }) {
     const content = state.analogy_content;
 
     return (
@@ -176,11 +182,20 @@ function AnalogyView({ state }: { state: LearningState }) {
                     </p>
                 )}
             </div>
+
+            <div className="mt-8 flex justify-center">
+                <button
+                    onClick={() => onLoadMore && onLoadMore("analogy")}
+                    className="px-6 py-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    Generate New Analogy
+                </button>
+            </div>
         </div>
     )
 }
 
-function FlashcardView({ state }: { state: LearningState }) {
+function FlashcardView({ state, onLoadMore }: { state: LearningState, onLoadMore?: () => void }) {
     const flashcards = state.flashcards || [];
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
@@ -190,6 +205,12 @@ function FlashcardView({ state }: { state: LearningState }) {
             <div className="flex flex-col items-center justify-center h-full text-foreground/40">
                 <Play className="w-12 h-12 mb-4 opacity-20" />
                 <p>No flashcards generated for this topic.</p>
+                <button
+                    onClick={() => onLoadMore && onLoadMore()}
+                    className="mt-4 px-4 py-2 rounded-lg bg-gemini-primary/10 text-gemini-primary hover:bg-gemini-primary/20 transition-colors"
+                >
+                    Generate Flashcards
+                </button>
             </div>
         );
     }
@@ -246,6 +267,14 @@ function FlashcardView({ state }: { state: LearningState }) {
                 >
                     Previous
                 </button>
+
+                <button
+                    onClick={() => onLoadMore && onLoadMore("flashcards")}
+                    className="px-6 rounded-2xl bg-foreground/5 hover:bg-foreground/10 text-foreground font-medium transition-all"
+                >
+                    Load More
+                </button>
+
                 <button
                     disabled={currentIndex === flashcards.length - 1}
                     onClick={(e) => { e.stopPropagation(); setCurrentIndex(i => i + 1); setIsFlipped(false); }}
@@ -258,7 +287,7 @@ function FlashcardView({ state }: { state: LearningState }) {
     )
 }
 
-function CheatSheetView({ state }: { state: LearningState }) {
+function CheatSheetView({ state, onLoadMore }: { state: LearningState, onLoadMore?: () => void }) {
     const items = state.cheat_sheet || ["No cheat sheet available."];
     return (
         <div className="p-8 max-w-3xl mx-auto overflow-y-auto h-full">
@@ -276,6 +305,14 @@ function CheatSheetView({ state }: { state: LearningState }) {
                         />
                     </div>
                 ))}
+            </div>
+            <div className="mt-8 text-center">
+                <button
+                    onClick={onLoadMore}
+                    className="px-6 py-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    Expand Cheat Sheet
+                </button>
             </div>
         </div>
     )
@@ -312,7 +349,7 @@ function MemoryMapView({ state }: { state: LearningState }) {
     )
 }
 
-function QuizView({ state }: { state: LearningState }) {
+function QuizView({ state, onLoadMore }: { state: LearningState, onLoadMore?: () => void }) {
     const quiz = state.competency_assessment?.micro_quiz;
 
     if (!quiz || quiz.length === 0) {
@@ -320,13 +357,28 @@ function QuizView({ state }: { state: LearningState }) {
             <div className="flex flex-col items-center justify-center h-full text-foreground/40">
                 <Play className="w-12 h-12 mb-4 opacity-10" />
                 <p>No micro-quiz generated for this session.</p>
+                <button
+                    onClick={() => onLoadMore && onLoadMore()}
+                    className="mt-6 px-6 py-2.5 rounded-xl bg-gemini-primary text-background font-bold hover:opacity-90 transition-all shadow-lg shadow-gemini-primary/20"
+                >
+                    Generate Practice Quiz
+                </button>
             </div>
         );
     }
 
     return (
         <div className="p-8 max-w-2xl mx-auto overflow-y-auto h-full">
-            <h3 className="text-xl font-bold mb-6">Quick Check</h3>
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold">Quick Check</h3>
+                <button
+                    onClick={onLoadMore}
+                    className="px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    New Questions
+                </button>
+            </div>
+
             <div className="space-y-6">
                 {quiz.map((q, i) => (
                     <div key={i} className="p-6 rounded-xl bg-foreground/5 border border-foreground/10">
@@ -364,15 +416,23 @@ function QuizView({ state }: { state: LearningState }) {
     )
 }
 
-function ResourcesView({ state }: { state: LearningState }) {
+function ResourcesView({ state, onLoadMore }: { state: LearningState, onLoadMore?: () => void }) {
     const resources = state.external_resources || [];
 
     return (
         <div className="p-8 max-w-4xl mx-auto overflow-y-auto h-full">
-            <h3 className="text-2xl font-bold mb-8 text-foreground flex items-center gap-2">
-                <Library className="w-6 h-6 text-gemini-primary" />
-                Learning Resources
-            </h3>
+            <div className="flex items-center justify-between mb-8">
+                <h3 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                    <Library className="w-6 h-6 text-gemini-primary" />
+                    Learning Resources
+                </h3>
+                <button
+                    onClick={onLoadMore}
+                    className="px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    Find More
+                </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {resources.map((res, i) => (
@@ -404,6 +464,12 @@ function ResourcesView({ state }: { state: LearningState }) {
                     <div className="col-span-full py-20 text-center opacity-50">
                         <Play className="w-12 h-12 mx-auto mb-4 text-foreground/40" />
                         <p className="text-foreground/40">Searching for high-quality courses and materials...</p>
+                        <button
+                            onClick={onLoadMore}
+                            className="mt-4 px-6 py-2 rounded-full bg-gemini-primary text-white hover:bg-gemini-primary/80 transition-colors"
+                        >
+                            Start Search
+                        </button>
                     </div>
                 )}
             </div>
@@ -411,7 +477,7 @@ function ResourcesView({ state }: { state: LearningState }) {
     )
 }
 
-function InfographicView({ state }: { state: LearningState }) {
+function InfographicView({ state, onLoadMore }: { state: LearningState, onLoadMore?: () => void }) {
     const summary = state.feedback_guidance?.summary_bullets || ["Decomposing system architecture...", "Mapping core dependencies...", "Optimizing learning flow..."];
 
     return (
@@ -426,18 +492,45 @@ function InfographicView({ state }: { state: LearningState }) {
                         {state.personalized_path?.recommended_topic || "Concept Overview"}
                     </h3>
 
-                    <div className="grid gap-4 w-full">
-                        {summary.map((point, i) => (
-                            <div
-                                key={point}
-                                className="flex items-center gap-4 text-left p-4 rounded-xl bg-foreground/5 border border-foreground/10 animate-fade-in"
-                                style={{ animationDelay: `${i * 200}ms` }}
-                            >
-                                <div className="w-2 h-2 rounded-full bg-gemini-primary shrink-0" />
-                                <p className="text-lg text-foreground/80 font-medium">{point}</p>
+                    {/* Placeholder Logic for "Nano Banana" Image */}
+                    {state.infographic?.imageUrl ? (
+                        <div className="relative w-full max-w-md aspect-square mb-6 rounded-xl overflow-hidden shadow-2xl border-4 border-white/10">
+                            {/* In a real app, this would be the Nano Banana generated image */}
+                            <img
+                                src={state.infographic.imageUrl}
+                                alt={state.infographic.altText}
+                                className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                                <p className="text-white text-xs font-mono uppercase tracking-widest">
+                                    Generated by Nano Banana
+                                </p>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center w-full">
+                            <div className="grid gap-4 w-full mb-8">
+                                {summary.map((point, i) => (
+                                    <div
+                                        key={point}
+                                        className="flex items-center gap-4 text-left p-4 rounded-xl bg-foreground/5 border border-foreground/10 animate-fade-in"
+                                        style={{ animationDelay: `${i * 200}ms` }}
+                                    >
+                                        <div className="w-2 h-2 rounded-full bg-gemini-primary shrink-0" />
+                                        <p className="text-lg text-foreground/80 font-medium">{point}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => onLoadMore && onLoadMore()}
+                                className="px-8 py-4 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-orange-500/20 flex items-center gap-3"
+                            >
+                                <Sparkles className="w-5 h-5" />
+                                Generate Visual Infographic
+                            </button>
+                            <p className="text-xs text-foreground/30 mt-3 font-mono">powered by Nano Banana</p>
+                        </div>
+                    )}
 
                     <div className="mt-8 flex items-center gap-6 text-foreground/20 text-sm font-mono uppercase tracking-[0.2em]">
                         <span>Infographic Mode</span>
@@ -472,6 +565,72 @@ function SourcesView({ state }: { state: LearningState }) {
                         <p>No external sources required for this explanation.</p>
                     </div>
                 )}
+            </div>
+        </div>
+    )
+}
+
+function ParetoView({ state, onLoadMore }: { state: LearningState, onLoadMore?: () => void }) {
+    const data = state.pareto_digest;
+
+    if (!data) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-foreground/40">
+                <Sparkles className="w-12 h-12 mb-4 opacity-20" />
+                <p>Generating default Pareto Principle analysis...</p>
+                <button
+                    onClick={() => onLoadMore && onLoadMore("pareto")}
+                    className="mt-4 px-4 py-2 rounded-lg bg-gemini-primary/10 text-gemini-primary hover:bg-gemini-primary/20 transition-colors"
+                >
+                    Generate Now
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="p-8 max-w-3xl mx-auto h-full overflow-y-auto">
+            <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
+                <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-2">
+                    <Sparkles className="text-emerald-500" />
+                    The 80/20 Principle
+                </h3>
+                <p className="text-lg font-medium text-foreground/90">{data.principle}</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+                <div className="p-6 rounded-2xl bg-foreground/5 border border-foreground/10">
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-gemini-primary mb-4 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-gemini-primary" />
+                        The Vital Few (20%)
+                    </h4>
+                    <ul className="space-y-3">
+                        {data.crucial_20_percent.map((item, i) => (
+                            <li key={i} className="flex gap-3 text-foreground/90 font-medium">
+                                <span className="opacity-50">{i + 1}.</span>
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-foreground/5 border border-foreground/10">
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-foreground/40 mb-4">
+                        The Useful Many (80%) Result
+                    </h4>
+                    <p className="text-foreground/70 leading-relaxed">
+                        {data.outcome_80_percent}
+                    </p>
+                </div>
+            </div>
+
+            <div className="mt-8 text-center">
+                <button
+                    onClick={() => onLoadMore && onLoadMore("pareto")}
+                    className="px-6 py-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    Deepen Analysis
+                </button>
             </div>
         </div>
     )

@@ -92,6 +92,15 @@ export const MOCK_RESPONSES: Record<string, Partial<LearningState>> = {
                     explanation: "Static data is baked into the executable."
                 }
             ]
+        },
+        infographic: {
+            imageUrl: "https://placehold.co/600x600/png?text=Rust+Ownership+Visualized",
+            altText: "A diagram showing a librarian (borrow checker) managing books (data)."
+        },
+        pareto_digest: {
+            principle: "Ownership is the 20% that solves 80% of memory bugs.",
+            crucial_20_percent: ["Ownership Rules", "Borrow Checker"],
+            outcome_80_percent: "Write memory-safe code without a garbage collector."
         }
     },
     "React State Management": {

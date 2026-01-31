@@ -49,16 +49,23 @@ graph TD
 *   **Book Dissection**: Deep-dives into specific literature, extracting "First Principles" rather than generic summaries.
 *   **Contextual Priority**: Uses Gemini 3's high-context window to prioritize provided source material over generic knowledge bases.
 
-### 2. **7-Agent Orchestrator** (Beyond Prompt Wrappers)
-Our architecture utilizes specialized agents for complex reasoning tasks:
+### 2. **7-Agent Orchestrator** (High-Fidelity Granular Streaming)
+Our architecture utilizes specialized agents for complex reasoning tasks, executing in parallel for sub-second hydration:
 *   **Agent A (Intent)**: Senses learner needs (Visualize vs. Evaluate).
 *   **Agent B (Visualizer)**: Generates valid React Flow JSON for architectural mapping.
-*   **Agent C (Personalization)**: Adjusts analogies based on "Vibes" (e.g., Explain tech via "Lord of the Rings").
-*   **Agent D (Scaffolder)**: Builds prerequisite trees to bridge knowledge gaps.
+*   **Agent C-E (Cognitive Cluster)**: Handles Personalization (Vibes), Scaffolding (Prerequisites), and Knowledge Retrieval.
+*   **Agent H (Content Swarm)**: A swarm of 6 sub-agents for granular content generation:
+    *   **H1 (Analogy)**: "City Traffic" vs "Water Pipes" metaphors.
+    *   **H2 (Flashcards)**: Active recall decks.
+    *   **H3 (Cheat Sheet)**: Markdown-rich summaries.
+    *   **H4 (Resources)**: Curated external links/books.
+    *   **H5 (Pareto Digest)**: 80/20 Principle analysis.
+    *   **H6 (Quiz Generator)**: Scenario-based micro-assessments.
 
 ### 3. **The Real-Time Teacher Flow**
-*   **Interactive System Diagrams**: Dynamic, draggable visualizations of concepts (Kubernetes, Rust Lifetimes, GCP VPCs).
-*   **Micro-Quizzes & Eval Loop**: Agent F constantly tests your competency, self-correcting the learning path based on your scenario-based answers.
+*   **Interactive System Diagrams**: Dynamic, draggable visualizations of concepts.
+*   **Nano Banana Infographics**: AI-generated visual summaries (beta).
+*   **Study Tools**: Integrated flashcards, quizzes, and cheat sheets that update in real-time as you chat.
 
 ---
 
@@ -94,6 +101,12 @@ A: Simply type `Book: [Title] [Topic]` or `Analyze this book: [Title]`. The Inte
 ### **Common Issues**
 **Q: My GUI isn't updating after a change?**
 A: Because of our heavy use of Next.js 14 static optimization, a **Hard Refresh (Ctrl+F5)** is recommended to sync the browser with the latest agentic build.
+
+**Q: "Address already in use" or Project stuck loading?**
+A: This usually means a previous Node process is stuck.
+1.  Open Terminal.
+2.  Run: `taskkill /F /IM node.exe` (Windows) or `pkill -f node` (Mac/Linux).
+3.  Restart: `npm run dev`.
 
 ---
 

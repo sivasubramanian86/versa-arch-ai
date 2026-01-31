@@ -4,11 +4,12 @@ import { generateWithFallback } from "@/lib/gemini";
 function determine_activated_agents(intent: string): string[] {
     switch (intent) {
         case "VISUALIZE": return ["visualizer", "evaluator", "feedback"];
-        case "UNDERSTAND": return ["scaffolder", "knowledge_manager", "personalization", "feedback"];
+        case "UNDERSTAND": return ["scaffolder", "knowledge_manager", "personalization", "visualizer", "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "feedback"];
         case "EVALUATE": return ["evaluator", "feedback"];
         case "SCAFFOLD": return ["scaffolder", "personalization", "feedback"];
         case "FIND_GAP": return ["evaluator", "personalization", "feedback"];
-        case "DISSECT": return ["knowledge_manager", "visualizer", "evaluator", "feedback"];
+        case "DISSECT": return ["knowledge_manager", "visualizer", "evaluator", "h5_pareto", "feedback"];
+        case "DEEPEN": return ["h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "feedback"]; // Re-run content
         default: return ["feedback"];
     }
 }
@@ -27,12 +28,13 @@ export async function agent_a_intent_classifier(state: LearningState): Promise<P
             - SCAFFOLD: "How do I learn", "Prerequisite", "Break it down"
             - FIND_GAP: "What should I know", "What am I missing"
             - DISSECT: "Analyze this", "Summarize this video", "Extract from this book", "Map this link"
+            - DEEPEN: "More examples", "Give me another analogy", "Load more flashcards", "Deep dive"
 
             Consider learner's current profile (skill_level, time_budget, learning_style).
 
             Output STRICT JSON:
             {
-              "intent": "VISUALIZE" | "UNDERSTAND" | "EVALUATE" | "SCAFFOLD" | "FIND_GAP" | "DISSECT",
+              "intent": "VISUALIZE" | "UNDERSTAND" | "EVALUATE" | "SCAFFOLD" | "FIND_GAP" | "DISSECT" | "DEEPEN",
               "confidence": 0.95,
               "reasoning": "Brief explanation..."
             }
@@ -56,7 +58,7 @@ export async function agent_a_intent_classifier(state: LearningState): Promise<P
         }) as Record<string, unknown>;
 
         const intentValue = String(parsed.intent || "UNDERSTAND");
-        const validIntents = ["VISUALIZE", "UNDERSTAND", "EVALUATE", "SCAFFOLD", "FIND_GAP", "DISSECT"];
+        const validIntents = ["VISUALIZE", "UNDERSTAND", "EVALUATE", "SCAFFOLD", "FIND_GAP", "DISSECT", "DEEPEN"];
         const finalIntent = validIntents.includes(intentValue) ? intentValue : "UNDERSTAND";
 
         return {

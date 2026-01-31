@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/rsc": "^2.0.64",
     "@google-cloud/vertexai": "^1.10.0",
     "@google/generative-ai": "^0.24.1",
     "@langchain/core": "^1.1.17",
     "@langchain/google-vertexai": "^2.1.14",
     "@langchain/langgraph": "^1.1.2",
+    "ai": "^6.0.64",
     "clsx": "^2.1.1",
     "firebase": "^12.8.0",
     "framer-motion": "^12.29.2",
@@ -36,6 +38,7 @@
     "eslint-config-next": "14.2.35",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.18"
   }
 }

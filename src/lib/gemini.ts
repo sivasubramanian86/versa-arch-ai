@@ -45,8 +45,7 @@ export async function generateWithFallback(options: {
             // Marathon Agent: Thinking Signatures & Levels
             if (useThinking) {
                 generationConfig.thinkingConfig = {
-                    includeThoughts: true,
-                    budgetTokens: 8000
+                    includeThoughts: true
                 };
             }
 
@@ -58,11 +57,31 @@ export async function generateWithFallback(options: {
             const responseText = result.response.text();
 
             if (isJson) {
-                const cleanJson = responseText.replace(/```json|```/g, "").trim();
+                let cleanJson = responseText;
+
+                // 1. Try to extract JSON from code blocks (handling Thinking output)
+                // Use a standard regex to capture the content inside ```json ... ``` or just ``` ... ```
+                const jsonBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+                if (jsonBlockMatch) {
+                    cleanJson = jsonBlockMatch[1].trim();
+                } else {
+                    // 2. Fallback: If no code blocks, try to find the first '{' and last '}' 
+                    // This handles cases where thoughts might be present but not code-blocked, or plain text with generic noise.
+                    const firstBrace = responseText.indexOf('{');
+                    const lastBrace = responseText.lastIndexOf('}');
+
+                    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                        cleanJson = responseText.substring(firstBrace, lastBrace + 1);
+                    } else {
+                        // 3. Last resort: simple replace (legacy behavior)
+                        cleanJson = responseText.replace(/```json|```/g, "").trim();
+                    }
+                }
+
                 try {
                     return JSON.parse(cleanJson);
                 } catch {
-                    console.error(`[Agent ${agentName}] JSON Parse failed for ${modelId}. Response:`, responseText.substring(0, 100));
+                    console.error(`[Agent ${agentName}] JSON Parse failed for ${modelId}. Response preview:`, responseText.substring(0, 200));
                     throw new Error("Invalid JSON response from model");
                 }
             }

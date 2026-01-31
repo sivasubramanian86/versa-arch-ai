@@ -6,6 +6,7 @@ export interface LearnerProfile {
     knowledge_gaps: string[];
     preferred_analogies: string[];
     time_budget: number; // Minutes available
+    goal?: string;
 }
 
 export interface RetrievedKnowledge {
@@ -31,7 +32,7 @@ export interface LearningState {
     domain: string;
 
     learner_profile: LearnerProfile;
-    detected_intent: "VISUALIZE" | "UNDERSTAND" | "EVALUATE" | "SCAFFOLD" | "FIND_GAP" | "DISSECT";
+    detected_intent: "VISUALIZE" | "UNDERSTAND" | "EVALUATE" | "SCAFFOLD" | "FIND_GAP" | "DISSECT" | "DEEPEN";
     intent_confidence: number;
     activated_agents: string[];
 
@@ -43,6 +44,10 @@ export interface LearningState {
     };
 
     diagram_json: Record<string, unknown> | null;
+    infographic?: {
+        imageUrl: string;
+        altText: string;
+    };
 
     personalized_path: {
         recommended_topic: string;
@@ -53,6 +58,11 @@ export interface LearningState {
     } | null;
 
     cheat_sheet?: string[];
+    pareto_digest?: {
+        principle: string;
+        crucial_20_percent: string[];
+        outcome_80_percent: string;
+    };
     analogy_content?: {
         analogy: string;
         explanation: string;
@@ -86,6 +96,14 @@ export interface LearningState {
             type: "mcq" | "trap" | "scenario";
         }[];
     } | null;
+
+    practice_quiz?: {
+        question: string;
+        options: string[];
+        answer: string;
+        explanation: string;
+        type: "mcq" | "trap" | "scenario";
+    }[];
 
     feedback_guidance: {
         encouragement: string;

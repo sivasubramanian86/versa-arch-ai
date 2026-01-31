@@ -49,6 +49,10 @@ export async function agent_b_visualizer(state: LearningState): Promise<Partial<
 
         return {
             diagram_json: parsed,
+            infographic: {
+                imageUrl: "/images/nano-banana-placeholder.png",
+                altText: `Infographic for ${topic} (Nano Banana Style)`
+            },
             routing_log: [
                 ...state.routing_log,
                 {
