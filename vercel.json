@@ -1,0 +1,12 @@
+{
+    "functions": {
+        "src/app/**/*": {
+            "maxDuration": 60
+        }
+    },
+    "env": {
+        "GEMINI_API_KEY": "REQUIRED_IN_VERCEL_DASHBOARD",
+        "GCP_PROJECT_ID": "OPTIONAL_FOR_VERTEX_RAG",
+        "GOOGLE_VERTEX_AI_WEB_CREDENTIALS": "OPTIONAL_JSON_CREDENTIALS_CONTENT"
+    }
+}
