@@ -4,13 +4,13 @@
 
 [![Versa Arch AI](https://via.placeholder.com/1200x600?text=Versa+Arch+AI+Dashboard)](http://localhost:3000)
 
-**VersaArch AI** is a multi-agent reasoning engine designed to decompose, visualize, and teach complex systems at the speed of thought. By leveraging **Gemini 2.0 Flash Thinking**, we've built more than a chatbot; we've built a **Real-Time Teacher** that senses user intent, dissects external sources (Videos/Books), and orchestrates a network of 7 autonomous agents to create a high-fidelity, adaptive learning environment.
+**VersaArch AI** is a multi-agent reasoning engine designed to decompose, visualize, and teach complex systems at the speed of thought. By leveraging **Gemini 3 Pro** (Adaptive Reasoning) and **Gemini 3 Flash** (High-Speed Fallback), we've built more than a chatbot; we've built a **Real-Time Teacher** that senses user intent, dissects external sources (Videos/Books), and orchestrates a network of 7 autonomous agents to create a high-fidelity, adaptive learning environment.
 
 ---
 
 ## 🏛️ System Architecture
 
-VersaArch AI operates on a **Multimodal Agentic Loop** powered by LangGraph. It is designed to model "Cause and Effect" in complex architectures rather than just retrieving text.
+VersaArch AI operates on a **Multimodal Agentic Loop** powered by Gemini 3 and LangGraph. It is designed to model "Cause and Effect" in complex architectures rather than just retrieving text.
 
 ```mermaid
 graph TD
@@ -66,7 +66,7 @@ Our architecture utilizes specialized agents for complex reasoning tasks:
 
 | Component | Technology | Role |
 | :--- | :--- | :--- |
-| **LLM Backend** | Gemini 2.0 Flash Thinking | Multimodal reasoning & "Thinking" signatures |
+| **LLM Backend** | Gemini 3 Pro & Flash | Primary reasoning with robust fallback and mock support. |
 | **Orchestration** | LangGraph.js | Stateful, multi-actor agent management |
 | **Frontend** | Next.js 14 (App Router) | SSR Stability & specialized routing hooks |
 | **Visuals** | React Flow | Interactive architecture graphing |
