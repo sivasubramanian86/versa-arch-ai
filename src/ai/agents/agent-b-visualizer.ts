@@ -49,10 +49,6 @@ export async function agent_b_visualizer(state: LearningState): Promise<Partial<
 
         return {
             diagram_json: parsed,
-            infographic: {
-                imageUrl: "/images/nano-banana-placeholder.png",
-                altText: `Infographic for ${topic} (Nano Banana Style)`
-            },
             routing_log: [
                 ...state.routing_log,
                 {
@@ -131,7 +127,9 @@ export async function agent_c_personalizer(state: LearningState): Promise<Partia
                 recommended_topic: state.learner_input,
                 difficulty_level: 5,
                 estimated_duration: 30,
+                traditional_duration_estimate: 90,
                 learning_sequence: ["Error: Could not personalize"],
+                time_saved_rationale: "Optimized path generated.",
                 personalization_rationale: "Failed to generate personalized path."
             }
         };

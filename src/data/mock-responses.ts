@@ -7,7 +7,9 @@ export const MOCK_RESPONSES: Record<string, Partial<LearningState>> = {
             recommended_topic: "Rust Ownership & Borrowing",
             difficulty_level: 8,
             estimated_duration: 45,
+            traditional_duration_estimate: 120,
             learning_sequence: ["Stack vs Heap", "Ownership Rules", "References & Borrowing", "Lifetimes"],
+            time_saved_rationale: "Directly targets the borrow checker rules, skipping generic syntax review.",
             personalization_rationale: "Given the complexity of Rust's memory model, we'll start with foundational stack/heap concepts before diving into the borrow checker rules."
         },
         diagram_json: {
@@ -93,10 +95,10 @@ export const MOCK_RESPONSES: Record<string, Partial<LearningState>> = {
                 }
             ]
         },
-        infographic: {
-            imageUrl: "https://placehold.co/600x600/png?text=Rust+Ownership+Visualized",
-            altText: "A diagram showing a librarian (borrow checker) managing books (data)."
-        },
+        // infographic: {
+        //     imageUrl: "https://placehold.co/600x600/png?text=Rust+Ownership+Visualized",
+        //     altText: "A diagram showing a librarian (borrow checker) managing books (data)."
+        // },
         pareto_digest: {
             principle: "Ownership is the 20% that solves 80% of memory bugs.",
             crucial_20_percent: ["Ownership Rules", "Borrow Checker"],
@@ -108,7 +110,9 @@ export const MOCK_RESPONSES: Record<string, Partial<LearningState>> = {
             recommended_topic: "Advanced State Management",
             difficulty_level: 6,
             estimated_duration: 30,
+            traditional_duration_estimate: 90,
             learning_sequence: ["Local State (useState)", "Context API", "Server State (TanStack)", "Global Stores (Zustand)"],
+            time_saved_rationale: "Prioritizes practical implementation over theoretical boilerplate.",
             personalization_rationale: "This path moves from built-in React hooks to modern external libraries."
         },
         diagram_json: {
@@ -183,7 +187,9 @@ export const MOCK_RESPONSES: Record<string, Partial<LearningState>> = {
             recommended_topic: "Google Cloud Platform Fundamentals",
             difficulty_level: 5,
             estimated_duration: 40,
+            traditional_duration_estimate: 180,
             learning_sequence: ["Compute (GCE, GKE)", "Storage (GCS, SQL)", "Networking (VPC)", "Serverless (Cloud Run)"],
+            time_saved_rationale: "Focuses on cloud-native patterns like Cloud Run to bypass legacy VM management.",
             personalization_rationale: "Focusing on the core pillars of GCP infrastructure."
         },
         diagram_json: {

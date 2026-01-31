@@ -47,13 +47,15 @@ export interface LearningState {
     infographic?: {
         imageUrl: string;
         altText: string;
-    };
-
+    } | null;
+    long_term_memory?: Record<string, unknown>; // Persistent user context (key-value store)
     personalized_path: {
         recommended_topic: string;
         difficulty_level: number;
+        traditional_duration_estimate: number;
         estimated_duration: number;
         learning_sequence: string[];
+        time_saved_rationale: string;
         personalization_rationale?: string;
     } | null;
 
@@ -71,6 +73,11 @@ export interface LearningState {
     flashcards?: {
         front: string;
         back: string;
+    }[];
+    mnemonics?: {
+        phrase: string;
+        expansion: string;
+        tip?: string;
     }[];
 
     external_resources?: ExternalResource[];

@@ -17,11 +17,13 @@ export async function agent_c_personalization_engine(state: LearningState): Prom
 
             Output STRICT JSON:
             {
-              "recommended_topic": "Topic Name",
-              "difficulty_level": 1-10,
-              "estimated_duration": minutes,
-              "learning_sequence": ["Step 1", "Step 2", ...],
-              "personalization_rationale": "Reasoning..."
+              "recommended_topic": "string",
+              "difficulty_level": number (1-10),
+              "estimated_duration": number (minutes),
+              "traditional_duration_estimate": number (minutes, usually 2-3x AI duration),
+              "learning_sequence": ["topic 1", "topic 2", ...],
+              "personalization_rationale": "Why this path?",
+              "time_saved_rationale": "How Versa Arch AI optimized this"
             }
             `;
 
@@ -40,11 +42,13 @@ export async function agent_c_personalization_engine(state: LearningState): Prom
         `;
 
     const mockResponse = {
-        recommended_topic: topic,
+        recommended_topic: state.learner_input,
         difficulty_level: 5,
         estimated_duration: 30,
-        learning_sequence: ["Overview", "Deeper Dive", "Application"],
-        personalization_rationale: "Default path pattern applied."
+        traditional_duration_estimate: 90,
+        learning_sequence: ["Basics", "Advanced"],
+        personalization_rationale: "Default path due to API limit.",
+        time_saved_rationale: "AI focuses on core architectural bottlenecks."
     };
 
     try {

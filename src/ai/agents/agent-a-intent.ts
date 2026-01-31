@@ -28,7 +28,7 @@ export async function agent_a_intent_classifier(state: LearningState): Promise<P
             - SCAFFOLD: "How do I learn", "Prerequisite", "Break it down"
             - FIND_GAP: "What should I know", "What am I missing"
             - DISSECT: "Analyze this", "Summarize this video", "Extract from this book", "Map this link"
-            - DEEPEN: "More examples", "Give me another analogy", "Load more flashcards", "Deep dive"
+            - DEEPEN: "More examples", "Give me another analogy", "Load more flashcards", "Deep dive", "Generate infographic", "Visual summary"
 
             Consider learner's current profile (skill_level, time_budget, learning_style).
 

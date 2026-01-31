@@ -3,7 +3,6 @@
 
 import { learningGraph } from "@/ai/graph";
 import { LearningState } from "@/types/learning-state";
-import { MOCK_RESPONSES } from "@/data/mock-responses";
 import { extractFromSource } from "@/lib/dissector";
 
 import { createStreamableValue } from "@ai-sdk/rsc";
@@ -49,15 +48,13 @@ export async function runLearningGraph(
                 streamMode: "updates",
             });
 
-            for await (const chunk of stream) {
+            for await (const chunk of stream as any) {
                 // Chunk keys correspond to the node names that just finished
                 // e.g., { intent_classifier: { ... } }
-                // @ts-ignore
                 for (const nodeName of Object.keys(chunk)) {
                     let displayName = "Processing...";
                     let status = "Working";
                     // Extract the output state from this node to stream partially
-                    // @ts-ignore
                     const partialData = chunk[nodeName];
 
                     switch (nodeName) {
@@ -74,6 +71,8 @@ export async function runLearningGraph(
                         case "h4_resources": displayName = "Agent H4: Curating Resources"; status = "Searching"; break;
                         case "h5_pareto": displayName = "Agent H5: Calculating Pareto Digest"; status = "Optimizing"; break;
                         case "h6_quiz": displayName = "Agent H6: Writing Quiz"; status = "Testing"; break;
+                        case "h7_infographic": displayName = "Agent H7: Visualizing Info"; status = "Drawing"; break;
+                        case "h8_mnemonic": displayName = "Agent H8: Mastering Memory"; status = "Drafting"; break;
 
                         case "evaluator": displayName = "Agent F: Evaluating Competency"; status = "Reviewing"; break;
                         case "feedback": displayName = "Agent G: Generating Feedback"; status = "Summarizing"; break;
@@ -105,8 +104,7 @@ export async function runLearningGraph(
             // efficient way: maintain state accumulator.
 
             const finalState = await learningGraph.invoke(initialState);
-            // @ts-ignore
-            progressStream.done({ agent: "Complete", status: "Done", finalState });
+            progressStream.done({ agent: "Complete", status: "Done", finalState: finalState as any });
 
         } catch (error) {
             console.error("Streaming Error:", error);

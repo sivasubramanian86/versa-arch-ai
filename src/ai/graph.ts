@@ -14,6 +14,8 @@ import { agent_h3_cheatsheet } from "./agents/content/agent-h3-cheatsheet";
 import { agent_h4_resources } from "./agents/content/agent-h4-resources";
 import { agent_h5_pareto } from "./agents/content/agent-h5-pareto";
 import { agent_h6_quiz } from "./agents/content/agent-h6-quiz";
+import { agent_h7_infographic } from "./agents/content/agent-h7-infographic";
+import { agent_h8_mnemonic } from "./agents/content/agent-h8-mnemonic";
 
 // Define the state channels configuration
 // We cast to any to allow the generic reducers to be accepted by the strict StateGraph typing
@@ -54,9 +56,11 @@ const stateChannels: any = {
     pareto_digest: { value: (x: any, y: any) => y ?? x, default: () => null },
     practice_quiz: { value: (x: any[], y: any[]) => y ?? x, default: () => [] },
     infographic: { value: (x: any, y: any) => y ?? x, default: () => null },
+    mnemonics: { value: (x: any[], y: any[]) => y ?? x, default: () => [] },
 
     messages: { value: (x: any[], y: any[]) => (x ?? []).concat(y ?? []), default: () => [] },
     memory_context: { value: (x: string, y: string) => y ?? x, default: () => "" },
+    long_term_memory: { value: (x: any, y: any) => ({ ...x, ...y }), default: () => ({}) }, // New Channel
     routing_log: { value: (x: any[], y: any[]) => (x ?? []).concat(y ?? []), default: () => [] },
     final_output: { value: (x: any, y: any) => y ?? x, default: () => ({}) },
 
@@ -91,6 +95,8 @@ graph.addNode("h3_cheatsheet", agent_h3_cheatsheet as any);
 graph.addNode("h4_resources", agent_h4_resources as any);
 graph.addNode("h5_pareto", agent_h5_pareto as any);
 graph.addNode("h6_quiz", agent_h6_quiz as any);
+graph.addNode("h7_infographic", agent_h7_infographic as any);
+graph.addNode("h8_mnemonic", agent_h8_mnemonic as any);
 
 graph.addNode("evaluator", agent_f_evaluator as any);
 graph.addNode("feedback", agent_g_feedback_engine as any);
@@ -111,7 +117,7 @@ function routeFromIntent(state: LearningState) {
             return [
                 "scaffolder", "personalization", "knowledge_manager", // Cognitive
                 "visualizer", // Visual
-                "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz" // Content
+                "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "h8_mnemonic" // Content
             ];
         case "EVALUATE":
             return ["evaluator"];
@@ -122,7 +128,7 @@ function routeFromIntent(state: LearningState) {
         case "DISSECT":
             return ["knowledge_manager", "visualizer", "evaluator", "h5_pareto"];
         case "DEEPEN":
-            return ["h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz"];
+            return ["h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "h7_infographic", "h8_mnemonic"];
         default:
             return ["feedback"]; // Fallback
     }
@@ -144,6 +150,8 @@ graph.addConditionalEdges(
         h4_resources: "h4_resources",
         h5_pareto: "h5_pareto",
         h6_quiz: "h6_quiz",
+        h7_infographic: "h7_infographic",
+        h8_mnemonic: "h8_mnemonic",
         evaluator: "evaluator",
         feedback: "feedback"
     }
@@ -160,7 +168,7 @@ graph.addEdge("visualizer", "evaluator");
 
 const parallelNodes = [
     "scaffolder", "personalization", "knowledge_manager",
-    "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz"
+    "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "h8_mnemonic", "h7_infographic"
 ];
 
 parallelNodes.forEach(node => {

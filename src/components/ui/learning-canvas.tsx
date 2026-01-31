@@ -1,40 +1,55 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { LearningState } from "@/types/learning-state";
-// Removed unused icons
 import {
-    Network, Sparkles, CheckSquare, BookOpen,
-    FileText, BrainCircuit, ExternalLink, Video,
-    Library, LayoutPanelTop, Play
+    Library, LayoutPanelTop, Play, Zap, Network, Sparkles, FileText, BrainCircuit, CheckSquare, BookOpen, Video, ExternalLink, Newspaper
 } from "lucide-react";
 import ReactFlow, { Background, Controls } from "reactflow";
 import "reactflow/dist/style.css";
 import clsx from "clsx";
+import { InfographicView } from "./infographic-view";
 
 interface LearningCanvasProps {
     state: LearningState;
     onLoadMore: (feature: string) => void;
+    loading?: boolean;
 }
 
-type Tab = "diagram" | "analogy" | "cheat_sheet" | "memory_map" | "quiz" | "resources" | "infographic" | "flashcards" | "pareto";
+type Tab = "diagram" | "analogy" | "cheat_sheet" | "memory_map" | "quiz" | "resources" | "infographic" | "flashcards" | "pareto" | "sources" | "mnemonics" | "study_plan";
 
-export function LearningCanvas({ state, onLoadMore }: LearningCanvasProps) {
+export function LearningCanvas({ state, onLoadMore, loading }: LearningCanvasProps) {
     const [activeTab, setActiveTab] = useState<Tab>("diagram");
 
-    const tabs = [
+    const tabs = useMemo(() => [
         { id: "diagram", label: "System Diagram", icon: Network },
-        { id: "infographic", label: "Infographic", icon: LayoutPanelTop },
-        { id: "analogy", label: "Analogy", icon: Sparkles },
+        { id: "infographic", label: "Infographic", icon: Sparkles },
+        { id: "analogy", label: "Analogy", icon: Newspaper },
         { id: "cheat_sheet", label: "Cheat Sheet", icon: FileText },
         { id: "flashcards", label: "Flashcards", icon: Play },
         { id: "memory_map", label: "Mental Map", icon: BrainCircuit },
         { id: "quiz", label: "Quick Check", icon: CheckSquare },
         { id: "resources", label: "Resources", icon: Library },
-        { id: "pareto", label: "Pareto (80/20)", icon: Sparkles },
+        { id: "pareto", label: "Pareto (80/20)", icon: Zap },
+        { id: "mnemonics", label: "Mnemonics", icon: BrainCircuit },
+        { id: "study_plan", label: "Study Plan", icon: LayoutPanelTop },
         { id: "sources", label: "Sources", icon: BookOpen },
-    ] as const;
+    ] as const, []);
+
+    // Listen for tab switch events from other components
+    useMemo(() => {
+        if (typeof window !== 'undefined') {
+            const handleSwitch = (e: any) => {
+                const targetTab = e.detail as Tab;
+                if (tabs.some(t => t.id === targetTab)) {
+                    setActiveTab(targetTab);
+                }
+            };
+            window.addEventListener('switch-tab', handleSwitch);
+            return () => window.removeEventListener('switch-tab', handleSwitch);
+        }
+    }, [tabs]);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[700px]">
@@ -70,7 +85,7 @@ export function LearningCanvas({ state, onLoadMore }: LearningCanvasProps) {
                     )}
 
                     {activeTab === "infographic" && (
-                        <InfographicView state={state} onLoadMore={() => onLoadMore("infographic")} />
+                        <InfographicView state={state} onLoadMore={() => onLoadMore("infographic")} loading={loading} />
                     )}
 
                     {activeTab === "analogy" && (
@@ -99,6 +114,14 @@ export function LearningCanvas({ state, onLoadMore }: LearningCanvasProps) {
 
                     {activeTab === "pareto" && (
                         <ParetoView state={state} onLoadMore={() => onLoadMore("pareto")} />
+                    )}
+
+                    {activeTab === "mnemonics" && (
+                        <MnemonicView state={state} onLoadMore={() => onLoadMore("mnemonics")} />
+                    )}
+
+                    {activeTab === "study_plan" && (
+                        <StudyPlanView state={state} />
                     )}
 
                     {activeTab === "sources" && (
@@ -144,11 +167,27 @@ export function LearningCanvas({ state, onLoadMore }: LearningCanvasProps) {
     );
 }
 
+// React Flow performance constants
+// We define empty but stable objects if no custom nodes/edges are used
+const BASE_NODE_TYPES = {};
+const BASE_EDGE_TYPES = {};
+
 function DiagramView({ data }: { data: any }) {
+    const nodes = useMemo(() => data.nodes || [], [data.nodes]);
+    const edges = useMemo(() => {
+        const nodeIds = new Set(nodes.map((n: any) => n.id));
+        return (data.edges || []).filter((e: any) => nodeIds.has(e.source) && nodeIds.has(e.target));
+    }, [data.edges, nodes]);
+    // Error #002 Fix: Strictest possible memoization for nodeTypes/edgeTypes
+    const nodeTypes = useMemo(() => BASE_NODE_TYPES, []);
+    const edgeTypes = useMemo(() => BASE_EDGE_TYPES, []);
+
     return (
         <ReactFlow
-            nodes={data.nodes}
-            edges={data.edges}
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             fitView
             proOptions={{ hideAttribution: true }}
             className="bg-background"
@@ -269,7 +308,7 @@ function FlashcardView({ state, onLoadMore }: { state: LearningState, onLoadMore
                 </button>
 
                 <button
-                    onClick={() => onLoadMore && onLoadMore("flashcards")}
+                    onClick={() => onLoadMore && onLoadMore()}
                     className="px-6 rounded-2xl bg-foreground/5 hover:bg-foreground/10 text-foreground font-medium transition-all"
                 >
                     Load More
@@ -477,70 +516,74 @@ function ResourcesView({ state, onLoadMore }: { state: LearningState, onLoadMore
     )
 }
 
-function InfographicView({ state, onLoadMore }: { state: LearningState, onLoadMore?: () => void }) {
-    const summary = state.feedback_guidance?.summary_bullets || ["Decomposing system architecture...", "Mapping core dependencies...", "Optimizing learning flow..."];
+
+
+
+function MnemonicView({ state, onLoadMore }: { state: LearningState, onLoadMore?: () => void }) {
+    const mnemonics = state.mnemonics || [];
 
     return (
-        <div className="p-8 h-full flex items-center justify-center">
-            <div className="max-w-xl w-full aspect-video rounded-3xl bg-gradient-to-br from-gemini-primary/20 via-foreground/5 to-gemini-secondary/20 p-1">
-                <div className="w-full h-full bg-background rounded-[22px] p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
-                    {/* Decorative elements */}
-                    <div className="absolute top-0 left-0 w-32 h-32 bg-gemini-primary/10 blur-3xl -translate-x-1/2 -translate-y-1/2" />
-                    <div className="absolute bottom-0 right-0 w-32 h-32 bg-gemini-secondary/10 blur-3xl translate-x-1/2 translate-y-1/2" />
+        <div className="p-8 max-w-4xl mx-auto h-full overflow-y-auto">
+            <div className="flex items-center justify-between mb-8">
+                <h3 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                    <Zap className="w-6 h-6 text-yellow-400" />
+                    Mnemonic Maestro
+                </h3>
+                <button
+                    onClick={onLoadMore}
+                    className="px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    Refresh Aids
+                </button>
+            </div>
 
-                    <h3 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gemini-primary to-gemini-secondary mb-8">
-                        {state.personalized_path?.recommended_topic || "Concept Overview"}
-                    </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {mnemonics.map((m, i) => (
+                    <div
+                        key={i}
+                        className="group relative p-8 rounded-[2rem] bg-gradient-to-br from-foreground/[0.02] to-foreground/[0.05] border border-foreground/10 hover:border-yellow-400/30 transition-all hover:scale-[1.02] duration-500 overflow-hidden"
+                    >
+                        {/* Decorative background glow */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400/5 blur-[50px] -translate-x-[-20%] -translate-y-[20%] group-hover:bg-yellow-400/10 transition-colors" />
 
-                    {/* Placeholder Logic for "Nano Banana" Image */}
-                    {state.infographic?.imageUrl ? (
-                        <div className="relative w-full max-w-md aspect-square mb-6 rounded-xl overflow-hidden shadow-2xl border-4 border-white/10">
-                            {/* In a real app, this would be the Nano Banana generated image */}
-                            <img
-                                src={state.infographic.imageUrl}
-                                alt={state.infographic.altText}
-                                className="object-cover w-full h-full hover:scale-105 transition-transform duration-700"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                                <p className="text-white text-xs font-mono uppercase tracking-widest">
-                                    Generated by Nano Banana
-                                </p>
+                        <div className="relative z-10">
+                            <div className="text-xs font-mono uppercase tracking-[0.3em] text-foreground/30 mb-4">
+                                Mnemonic {i + 1}
                             </div>
+                            <h4 className="text-4xl font-black text-yellow-400 mb-4 tracking-tight">
+                                {m.phrase}
+                            </h4>
+                            <p className="text-xl font-medium text-foreground/90 leading-tight mb-6">
+                                {m.expansion}
+                            </p>
+                            {m.tip && (
+                                <div className="p-4 rounded-2xl bg-foreground/5 border border-foreground/5 text-sm text-foreground/50 italic flex items-start gap-3">
+                                    <Sparkles className="w-4 h-4 mt-0.5 shrink-0 text-yellow-400/50" />
+                                    {m.tip}
+                                </div>
+                            )}
                         </div>
-                    ) : (
-                        <div className="flex flex-col items-center w-full">
-                            <div className="grid gap-4 w-full mb-8">
-                                {summary.map((point, i) => (
-                                    <div
-                                        key={point}
-                                        className="flex items-center gap-4 text-left p-4 rounded-xl bg-foreground/5 border border-foreground/10 animate-fade-in"
-                                        style={{ animationDelay: `${i * 200}ms` }}
-                                    >
-                                        <div className="w-2 h-2 rounded-full bg-gemini-primary shrink-0" />
-                                        <p className="text-lg text-foreground/80 font-medium">{point}</p>
-                                    </div>
-                                ))}
-                            </div>
-                            <button
-                                onClick={() => onLoadMore && onLoadMore()}
-                                className="px-8 py-4 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-orange-500/20 flex items-center gap-3"
-                            >
-                                <Sparkles className="w-5 h-5" />
-                                Generate Visual Infographic
-                            </button>
-                            <p className="text-xs text-foreground/30 mt-3 font-mono">powered by Nano Banana</p>
-                        </div>
-                    )}
-
-                    <div className="mt-8 flex items-center gap-6 text-foreground/20 text-sm font-mono uppercase tracking-[0.2em]">
-                        <span>Infographic Mode</span>
-                        <div className="w-1 h-1 rounded-full bg-foreground/10" />
-                        <span>v1.0.4</span>
                     </div>
-                </div>
+                ))}
+
+                {mnemonics.length === 0 && (
+                    <div className="col-span-full py-20 text-center">
+                        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-foreground/5 flex items-center justify-center">
+                            <Zap className="w-10 h-10 text-foreground/10" />
+                        </div>
+                        <h4 className="text-xl font-bold text-foreground/40 mb-2">No Mnemonics Yet</h4>
+                        <p className="text-foreground/30 mb-8 max-w-xs mx-auto">Let the Mnemonic Maestro craft some sticky memory aids for this topic.</p>
+                        <button
+                            onClick={onLoadMore}
+                            className="px-8 py-3 rounded-full bg-yellow-400 text-black font-bold hover:scale-105 transition-transform shadow-lg shadow-yellow-400/20"
+                        >
+                            Draft Memory Aids
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
-    )
+    );
 }
 
 function SourcesView({ state }: { state: LearningState }) {
@@ -570,6 +613,78 @@ function SourcesView({ state }: { state: LearningState }) {
     )
 }
 
+function StudyPlanView({ state }: { state: LearningState }) {
+    const path = state.personalized_path;
+    if (!path) return <div className="p-8 text-center text-foreground/40">Analyzing your study path...</div>;
+
+    const aiTime = path.estimated_duration;
+    const tradTime = path.traditional_duration_estimate;
+    const timeSaved = tradTime - aiTime;
+
+    return (
+        <div className="p-8 max-w-4xl mx-auto h-full overflow-y-auto">
+            <div className="flex items-center justify-between mb-12">
+                <div>
+                    <h3 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
+                        <LayoutPanelTop className="w-8 h-8 text-gemini-primary" />
+                        AI-Optimized Study Plan
+                    </h3>
+                    <p className="text-foreground/60">Tailored Roadmap for {path.recommended_topic}</p>
+                </div>
+            </div>
+
+            {/* Time Saved Card */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div className="p-6 rounded-[2rem] bg-gemini-primary/10 border border-gemini-primary/20 flex flex-col items-center justify-center text-center">
+                    <span className="text-sm font-mono uppercase tracking-widest text-gemini-primary/60 mb-2">Traditional Time</span>
+                    <span className="text-4xl font-black text-foreground opacity-40">{tradTime}m</span>
+                </div>
+                <div className="p-8 rounded-[2.5rem] bg-foreground text-background shadow-2xl scale-110 z-10 flex flex-col items-center justify-center text-center">
+                    <span className="text-xs font-mono uppercase tracking-[0.3em] text-background/50 mb-3">AI Path</span>
+                    <span className="text-5xl font-black mb-2">{aiTime}m</span>
+                    <div className="px-3 py-1 rounded-full bg-gemini-primary text-white text-[10px] font-bold">OPTIMIZED</div>
+                </div>
+                <div className="p-6 rounded-[2rem] bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center justify-center text-center">
+                    <span className="text-sm font-mono uppercase tracking-widest text-emerald-500/60 mb-2">Time Saved</span>
+                    <span className="text-4xl font-black text-emerald-500">-{timeSaved}m</span>
+                </div>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-foreground/[0.02] border border-foreground/5 mb-12 flex items-start gap-4 italic text-foreground/70">
+                <Sparkles className="w-5 h-5 text-gemini-primary shrink-0 mt-1" />
+                <p>&quot;{path.time_saved_rationale}&quot;</p>
+            </div>
+
+            {/* Timeline */}
+            <div className="space-y-4">
+                <h4 className="text-lg font-bold mb-6 flex items-center gap-2">
+                    <Network className="w-5 h-5 text-foreground/40" />
+                    Learning Sequence
+                </h4>
+                {path.learning_sequence.map((step, i) => (
+                    <div key={i} className="group flex items-center gap-6 p-4 rounded-2xl hover:bg-foreground/5 transition-all">
+                        <div className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center font-black text-foreground/20 group-hover:bg-gemini-primary/20 group-hover:text-gemini-primary transition-colors">
+                            {i + 1}
+                        </div>
+                        <div>
+                            <p className="text-lg font-bold text-foreground/80">{step}</p>
+                            <div className="flex items-center gap-3 mt-1">
+                                <span className="text-xs font-mono text-foreground/30 uppercase tracking-widest">Mastery Focus</span>
+                                <div className="h-1 w-24 bg-foreground/10 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-gemini-primary animate-pulse"
+                                        style={{ width: `${Math.random() * 40 + 40}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function ParetoView({ state, onLoadMore }: { state: LearningState, onLoadMore?: () => void }) {
     const data = state.pareto_digest;
 
@@ -579,7 +694,7 @@ function ParetoView({ state, onLoadMore }: { state: LearningState, onLoadMore?: 
                 <Sparkles className="w-12 h-12 mb-4 opacity-20" />
                 <p>Generating default Pareto Principle analysis...</p>
                 <button
-                    onClick={() => onLoadMore && onLoadMore("pareto")}
+                    onClick={() => onLoadMore && onLoadMore()}
                     className="mt-4 px-4 py-2 rounded-lg bg-gemini-primary/10 text-gemini-primary hover:bg-gemini-primary/20 transition-colors"
                 >
                     Generate Now
@@ -626,7 +741,7 @@ function ParetoView({ state, onLoadMore }: { state: LearningState, onLoadMore?: 
 
             <div className="mt-8 text-center">
                 <button
-                    onClick={() => onLoadMore && onLoadMore("pareto")}
+                    onClick={() => onLoadMore && onLoadMore()}
                     className="px-6 py-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
                 >
                     Deepen Analysis

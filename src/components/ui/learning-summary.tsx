@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock, BarChart3, ListChecks, Newspaper, Video, Book as BookIcon } from "lucide-react";
+import { Clock, BarChart3, ListChecks, Newspaper, Video, Book as BookIcon, Sparkles } from "lucide-react";
 import { LearningState } from "@/types/learning-state";
 
 interface SummaryCardProps {
@@ -21,50 +21,64 @@ export function LearningSummary({ state }: SummaryCardProps) {
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
         >
             {/* Main Summary */}
-            <div className="md:col-span-2 bg-foreground/5 backdrop-blur-xl border border-foreground/10 shadow-[0_0_40px_rgba(71,150,227,0.1)] rounded-2xl p-6 relative overflow-hidden">
+            <div className="md:col-span-2 bg-foreground/5 backdrop-blur-xl border border-foreground/10 shadow-[0_0_40px_rgba(71,150,227,0.1)] rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between">
                 <div className="absolute top-0 right-0 p-4 opacity-10">
                     <ListChecks className="w-24 h-24 text-gemini-primary" />
                 </div>
 
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <span className="w-2 h-6 rounded-full bg-gemini-primary" />
-                        Concept Summary
-                    </h3>
+                <div>
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xl font-semibold flex items-center gap-2">
+                            <span className="w-2 h-6 rounded-full bg-gemini-primary" />
+                            Concept Summary
+                        </h3>
 
-                    {state.source_metadata && (
-                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] uppercase tracking-widest text-foreground/40">
-                            {state.source_metadata.type === "video" && <Video className="w-3 h-3 text-red-500" />}
-                            {state.source_metadata.type === "book" && <BookIcon className="w-3 h-3 text-blue-500" />}
-                            {!["video", "book"].includes(state.source_metadata.type) && <Newspaper className="w-3 h-3 text-gemini-primary" />}
-                            {state.source_metadata.type} Dissection
-                        </div>
-                    )}
-                </div>
-
-                <div className="space-y-2 mb-6">
-                    {summary.summary_bullets?.map((bullet, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-foreground/5 border border-foreground/5">
-                            <div className="w-5 h-5 rounded-full bg-gemini-primary/20 flex items-center justify-center text-gemini-primary text-xs font-bold mt-0.5">
-                                {i + 1}
+                        {state.source_metadata && (
+                            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] uppercase tracking-widest text-foreground/40">
+                                {state.source_metadata.type === "video" && <Video className="w-3 h-3 text-red-500" />}
+                                {state.source_metadata.type === "book" && <BookIcon className="w-3 h-3 text-blue-500" />}
+                                {!["video", "book"].includes(state.source_metadata.type) && <Newspaper className="w-3 h-3 text-gemini-primary" />}
+                                {state.source_metadata.type} Dissection
                             </div>
-                            <p className="text-foreground/80 text-sm leading-relaxed">{bullet}</p>
-                        </div>
-                    ))}
-                    {!summary.summary_bullets && (
-                        <p className="text-foreground/40 italic">Generating summary points...</p>
-                    )}
+                        )}
+                    </div>
+
+                    <div className="space-y-2 mb-6">
+                        {summary.summary_bullets?.map((bullet, i) => (
+                            <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-foreground/5 border border-foreground/5">
+                                <div className="w-5 h-5 rounded-full bg-gemini-primary/20 flex items-center justify-center text-gemini-primary text-xs font-bold mt-0.5">
+                                    {i + 1}
+                                </div>
+                                <p className="text-foreground/80 text-sm leading-relaxed">{bullet}</p>
+                            </div>
+                        ))}
+                        {!summary.summary_bullets && (
+                            <p className="text-foreground/40 italic">Generating summary points...</p>
+                        )}
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-6 text-sm text-foreground/40">
-                    <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-gemini-secondary" />
-                        <span>{summary.time_estimate || 15} min estimate</span>
+                <div className="flex items-center justify-between mt-4">
+                    <div className="flex items-center gap-6 text-sm text-foreground/40">
+                        <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-gemini-secondary" />
+                            <span>{summary.time_estimate || 15} min estimate</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <BarChart3 className="w-4 h-4 text-gemini-accent" />
+                            <span>{summary.difficulty_label || "Intermediate"}</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-gemini-accent" />
-                        <span>{summary.difficulty_label || "Intermediate"}</span>
-                    </div>
+
+                    {!state.infographic?.imageUrl && (
+                        <button
+                            onClick={() => window.dispatchEvent(new CustomEvent('switch-tab', { detail: 'infographic' }))}
+                            className="text-[10px] font-bold px-3 py-1.5 rounded-full bg-gemini-primary/10 text-gemini-primary border border-gemini-primary/20 hover:bg-gemini-primary/20 transition-all flex items-center gap-2 group"
+                        >
+                            <Sparkles className="w-3 h-3 group-hover:scale-125 transition-transform" />
+                            Generate Visual Infographic
+                        </button>
+                    )}
                 </div>
             </div>
 

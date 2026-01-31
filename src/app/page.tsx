@@ -83,7 +83,7 @@ export default function Home() {
 
     try {
       const { progress } = await runLearningGraph(
-        `Deepen understanding of ${feature} for ${learningState.learner_input}`,
+        feature === "infographic" ? `Generate visual infographic for ${learningState.learner_input}` : `Deepen understanding of ${feature} for ${learningState.learner_input}`,
         learningState.learner_profile,
         learningState // Pass current state as context
       );
@@ -138,38 +138,44 @@ export default function Home() {
         )}
 
         {loading && currentAgent && (
-          <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
-            <div className="w-64 h-2 bg-secondary rounded-full overflow-hidden relative mb-6">
+          <div className={`flex flex-col items-center justify-center animate-fade-in ${learningState ? 'py-4 opacity-75' : 'py-20'}`}>
+            <div className={`w-64 h-2 bg-secondary rounded-full overflow-hidden relative mb-6 ${learningState ? 'scale-75' : ''}`}>
               <div className="absolute inset-0 bg-gradient-to-r from-gemini-primary to-gemini-secondary animate-pulse-width" style={{ width: '100%' }} />
               <div className="absolute inset-0 bg-white/20 animate-shimmer" />
             </div>
 
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 rounded-full bg-gemini-primary animate-ping" />
-              <p className="text-xl font-light text-foreground/90">
+              <p className={learningState ? "text-lg font-light text-foreground/70" : "text-xl font-light text-foreground/90"}>
                 {currentAgent.agent}
               </p>
             </div>
             <p className="text-sm text-foreground/50 mt-2 font-mono uppercase tracking-widest">{currentAgent.status}</p>
 
-            <div className="flex gap-2 mt-8 text-xs text-foreground/30 font-mono">
-              <span className={currentAgent.agent.includes("Intent") ? "text-gemini-primary font-bold" : ""}>INTENT</span>
-              <span>→</span>
-              <span className={currentAgent.agent.includes("Knowledge") ? "text-gemini-primary font-bold" : ""}>CTX</span>
-              <span>→</span>
-              <span className={currentAgent.agent.includes("Study") ? "text-gemini-primary font-bold" : ""}>GEN</span>
-              <span>→</span>
-              <span className={currentAgent.agent.includes("Visualizing") ? "text-gemini-primary font-bold" : ""}>VIS</span>
-              <span>→</span>
-              <span className={currentAgent.agent.includes("Feedback") ? "text-gemini-primary font-bold" : ""}>REV</span>
-            </div>
+            {!learningState && (
+              <div className="flex gap-2 mt-8 text-xs text-foreground/30 font-mono">
+                <span className={currentAgent.agent.includes("Intent") ? "text-gemini-primary font-bold" : ""}>INTENT</span>
+                <span>→</span>
+                <span className={currentAgent.agent.includes("Knowledge") ? "text-gemini-primary font-bold" : ""}>CTX</span>
+                <span>→</span>
+                <span className={currentAgent.agent.includes("Study") ? "text-gemini-primary font-bold" : ""}>GEN</span>
+                <span>→</span>
+                <span className={currentAgent.agent.includes("Visualizing") ? "text-gemini-primary font-bold" : ""}>VIS</span>
+                <span>→</span>
+                <span className={currentAgent.agent.includes("Feedback") ? "text-gemini-primary font-bold" : ""}>REV</span>
+              </div>
+            )}
           </div>
         )}
 
         {learningState && (
           <div className="animate-fade-in space-y-8">
             <LearningSummary state={learningState} />
-            <LearningCanvas state={learningState} onLoadMore={handleLoadMore} />
+            <LearningCanvas
+              state={learningState}
+              onLoadMore={handleLoadMore}
+              loading={loading}
+            />
           </div>
         )}
       </main>
@@ -177,7 +183,7 @@ export default function Home() {
       {/* Footer / Status Bar */}
       <footer className="fixed bottom-0 inset-x-0 h-10 bg-background/80 backdrop-blur-md border-t border-foreground/5 flex items-center justify-between px-6 text-[10px] text-foreground/40 z-50">
         <div className="flex items-center gap-4">
-          <span>Powered by Gemini 2.0 Flash Thinking</span>
+          <span>Powered by Gemini 3.0 Flash Thinking</span>
           <span className="hidden md:inline text-foreground/10">|</span>
           <span className="hidden md:inline">Latency: ~4.2s</span>
         </div>

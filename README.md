@@ -54,18 +54,22 @@ Our architecture utilizes specialized agents for complex reasoning tasks, execut
 *   **Agent A (Intent)**: Senses learner needs (Visualize vs. Evaluate).
 *   **Agent B (Visualizer)**: Generates valid React Flow JSON for architectural mapping.
 *   **Agent C-E (Cognitive Cluster)**: Handles Personalization (Vibes), Scaffolding (Prerequisites), and Knowledge Retrieval.
-*   **Agent H (Content Swarm)**: A swarm of 6 sub-agents for granular content generation:
+*   **Agent H (Content Swarm)**: A swarm of 8 sub-agents for granular content generation:
     *   **H1 (Analogy)**: "City Traffic" vs "Water Pipes" metaphors.
     *   **H2 (Flashcards)**: Active recall decks.
     *   **H3 (Cheat Sheet)**: Markdown-rich summaries.
     *   **H4 (Resources)**: Curated external links/books.
     *   **H5 (Pareto Digest)**: 80/20 Principle analysis.
     *   **H6 (Quiz Generator)**: Scenario-based micro-assessments.
+    *   **H7 (Infographics)**: "Nano Banana" generative visuals.
+    *   **H8 (Mnemonics)**: Creative memory aids and acronyms.
 
 ### 3. **The Real-Time Teacher Flow**
 *   **Interactive System Diagrams**: Dynamic, draggable visualizations of concepts.
 *   **Nano Banana Infographics**: AI-generated visual summaries (beta).
-*   **Study Tools**: Integrated flashcards, quizzes, and cheat sheets that update in real-time as you chat.
+*   **Persistent Memory System**: Short and long-term context tracking via `memory_manager`.
+*   **Modular Skills**: Decoupled capabilities like image generation and memory access.
+*   **Study Tools**: Integrated flashcards, quizzes, and mnemonics that update in real-time.
 
 ---
 
