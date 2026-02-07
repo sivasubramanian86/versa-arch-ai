@@ -65,6 +65,7 @@ export async function runLearningGraph(
 
             for await (const chunk of stream as any) {
                 // Chunk keys correspond to the node names that just finished
+                console.log("[Server Action] Stream Chunk Keys:", Object.keys(chunk));
                 for (const nodeName of Object.keys(chunk)) {
                     let displayName = "Processing...";
                     let status = "Working";

@@ -30,7 +30,7 @@ function determine_activated_agents(intent: string, input: string = ""): string[
     switch (intent) {
         case "UNDERSTAND":
             // Return only parallel content agents. Evaluator and Feedback are chained downstream in graph.ts
-            return ["scaffolder", "knowledge_manager", "personalization", "visualizer", "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "h8_mnemonic", "h7_infographic"];
+            return ["scaffolder", "knowledge_manager", "personalization", "visualizer", "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "h8_mnemonic"];
         case "EVALUATE": return ["evaluator"]; // Feedback is downstream of evaluator
         case "SCAFFOLD": return ["scaffolder", "personalization"]; // Feedback downstream
         case "FIND_GAP": return ["evaluator", "personalization"]; // Feedback downstream
@@ -116,7 +116,8 @@ export async function agent_a_intent_classifier(state: LearningState): Promise<P
         return {
             detected_intent: "UNDERSTAND",
             intent_confidence: 0.5,
-            activated_agents: ["scaffolder", "feedback"]
+            // Fallback: Return everything EXCEPT infographic to avoid auto-generation in error states
+            activated_agents: ["scaffolder", "knowledge_manager", "personalization", "visualizer", "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "h8_mnemonic", "feedback"]
         };
     }
 }
