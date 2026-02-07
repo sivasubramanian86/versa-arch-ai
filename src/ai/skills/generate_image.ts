@@ -1,7 +1,7 @@
 import { GoogleAuth } from "google-auth-library";
 
 // Nano Banana Image Generation Skill
-// Integrates real Imagen 2 via Google Cloud Vertex AI (REST API)
+// Integrates real Imagen 4 via Google Cloud Vertex AI (REST API)
 // Falls back to placeholder if API not configured
 
 export async function generateImageSkill(prompt: string, apiKey?: string): Promise<{ imageUrl: string; altText: string }> {
@@ -9,9 +9,9 @@ export async function generateImageSkill(prompt: string, apiKey?: string): Promi
 
     const projectId = process.env.GCLOUD_PROJECT || 'versa-arch-ai';
     const location = 'us-central1';
-    const modelId = 'imagegeneration@006'; // Imagen 2
+    const modelId = 'imagegeneration@006'; // Imagen 4
 
-    // 1. Real API Call: Google Cloud Vertex AI - Imagen 2 (Direct REST)
+    // 1. Real API Call: Google Cloud Vertex AI - Imagen 4 (Direct REST)
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GCLOUD_PROJECT) {
         try {
             console.log('[Skill:GenerateImage] Attempting to resolve Google Cloud credentials...');

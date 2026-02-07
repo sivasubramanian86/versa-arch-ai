@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useThemeStore } from "@/store/theme-store";
+import { useUIStore } from "@/store/ui-store";
 import { Sparkles, Moon, Sun, Menu, HelpCircle, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function AppHeader() {
     const { theme, toggle } = useThemeStore();
+    const { openCourses, closeCourses, isCoursesOpen, openFeedback, closeFeedback, isFeedbackOpen } = useUIStore();
     const [mounted, setMounted] = useState(false);
     const [currentPath, setCurrentPath] = useState("");
     const [faqOpen, setFaqOpen] = useState(false);
@@ -47,18 +49,37 @@ export function AppHeader() {
 
                     {/* Nav Links (Desktop) */}
                     <nav className="hidden lg:flex items-center gap-8 text-sm font-medium">
-                        {routes.map((route) => (
-                            <Link
-                                key={route.path}
-                                href={route.path}
-                                className={`transition-colors ${currentPath === route.path
-                                    ? "text-gemini-primary font-bold"
-                                    : "text-foreground/60 hover:text-foreground"
-                                    }`}
-                            >
-                                {route.name}
-                            </Link>
-                        ))}
+                        <Link
+                            href="/"
+                            className={`transition-colors ${currentPath === "/" && !isCoursesOpen && !isFeedbackOpen
+                                ? "text-gemini-primary font-bold"
+                                : "text-foreground/60 hover:text-foreground"
+                                }`}
+                            onClick={() => {
+                                closeCourses();
+                                closeFeedback();
+                            }}
+                        >
+                            Playground
+                        </Link>
+                        <button
+                            onClick={openCourses}
+                            className={`transition-colors ${isCoursesOpen
+                                ? "text-gemini-primary font-bold"
+                                : "text-foreground/60 hover:text-foreground"
+                                }`}
+                        >
+                            Courses
+                        </button>
+                        <button
+                            onClick={openFeedback}
+                            className={`transition-colors ${isFeedbackOpen
+                                ? "text-gemini-primary font-bold"
+                                : "text-foreground/60 hover:text-foreground"
+                                }`}
+                        >
+                            Feedback
+                        </button>
                     </nav>
 
                     {/* Actions */}

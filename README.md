@@ -61,7 +61,7 @@ Our architecture utilizes specialized agents for complex reasoning tasks, execut
     *   **H4 (Resources)**: Curated external links/books.
     *   **H5 (Pareto Digest)**: 80/20 Principle analysis.
     *   **H6 (Quiz Generator)**: Scenario-based micro-assessments.
-    *   **H7 (Infographics)**: "Nano Banana" generative visuals powered by **Google Cloud Vertex AI (Imagen 2)** with semantic fallback.
+    *   **H7 (Infographics)**: "Nano Banana" generative visuals powered by **Google Cloud Vertex AI (Imagen 4)** with semantic fallback.
     *   **H8 (Mnemonics)**: Creative memory aids and acronyms.
 
 ### 3. **The Real-Time Teacher Flow**

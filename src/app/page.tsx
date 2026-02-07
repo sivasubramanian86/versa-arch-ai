@@ -8,6 +8,8 @@ import { AppHeader } from "@/components/ui/app-header";
 import { HeroSection } from "@/components/ui/hero-section";
 import { LearningSummary } from "@/components/ui/learning-summary";
 import { LearningCanvas } from "@/components/ui/learning-canvas";
+import { CoursesOverlay } from "@/components/features/courses-overlay";
+import { FeedbackOverlay } from "@/components/features/feedback-overlay";
 
 import { readStreamableValue } from "@ai-sdk/rsc";
 
@@ -191,6 +193,9 @@ export default function Home() {
           VersaArch AI v1.0.4 (Beta)
         </div>
       </footer>
+
+      <CoursesOverlay />
+      <FeedbackOverlay />
     </div>
   );
 }
