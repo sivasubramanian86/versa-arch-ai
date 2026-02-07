@@ -23,12 +23,23 @@ export function InfographicView({ state, onLoadMore, loading }: { state: Learnin
                     <div className="absolute top-0 left-0 w-32 h-32 bg-gemini-primary/10 blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
                     <div className="absolute bottom-0 right-0 w-32 h-32 bg-gemini-secondary/10 blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
-                    <h3 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gemini-primary to-gemini-secondary mb-8">
-                        {state.personalized_path?.recommended_topic || "Concept Overview"}
-                    </h3>
+                    <div className="flex justify-between items-center w-full mb-8 relative z-10">
+                        <h3 id="infographic-title" className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gemini-primary to-gemini-secondary">
+                            {state.personalized_path?.recommended_topic || "Concept Overview"}
+                        </h3>
+                        {!loading && (
+                            <button
+                                onClick={() => onLoadMore && onLoadMore()}
+                                className="px-4 py-2 rounded-full bg-gemini-primary/10 text-gemini-primary hover:bg-gemini-primary/20 transition-colors flex items-center gap-2 text-sm font-medium"
+                            >
+                                <Sparkles className="w-4 h-4" />
+                                {state.infographic?.imageUrl && !state.infographic.imageUrl.includes("placeholder") && !state.infographic.imageUrl.includes("placehold.co") ? "Regenerate" : "Generate Visual"}
+                            </button>
+                        )}
+                    </div>
 
                     {/* Placeholder Logic for "Nano Banana" Image */}
-                    {state.infographic?.imageUrl ? (
+                    {state.infographic?.imageUrl && !state.infographic.imageUrl.includes("placeholder") && !state.infographic.imageUrl.includes("placehold.co") ? (
                         <div className="flex flex-col items-center w-full">
                             <div className="relative w-full max-w-md aspect-square mb-6 rounded-xl overflow-hidden shadow-2xl border-4 border-white/10 group">
                                 {loading && (
@@ -96,7 +107,9 @@ export function InfographicView({ state, onLoadMore, loading }: { state: Learnin
                                                 style={{ animationDelay: `${i * 200}ms` }}
                                             >
                                                 <div className="w-2 h-2 rounded-full bg-gemini-primary shrink-0" />
-                                                <p className="text-lg text-foreground/80 font-medium">{point}</p>
+                                                <p className="text-lg text-foreground/80 font-medium">
+                                                    {typeof point === 'string' ? point : JSON.stringify(point)}
+                                                </p>
                                             </div>
                                         ))}
                                     </div>

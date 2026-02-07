@@ -13,3 +13,4 @@ export * from "./content/agent-h3-cheatsheet";
 export * from "./content/agent-h4-resources";
 export * from "./content/agent-h5-pareto";
 export * from "./content/agent-h6-quiz";
+export * from "./content/agent-h7-infographic";

@@ -2,7 +2,7 @@ import { LearningState } from "@/types/learning-state";
 import { generateImageSkill } from "@/ai/skills/generate_image";
 
 export async function agent_h7_infographic(state: LearningState) {
-    const topic = state.personalized_path?.recommended_topic || "System Architecture";
+    const topic = state.personalized_path?.recommended_topic || state.learner_input || "System Architecture";
     const context = state.memory_context || "general technical context";
 
     console.log(`[Agent H7] Generating Infographic for: ${topic}`);

@@ -19,5 +19,5 @@ export async function agent_h2_flashcards(state: LearningState): Promise<Partial
     try {
         const parsed = await generateWithFallback({ agentName: "H2", systemInstruction, userPrompt, mockResponse: mock });
         return { flashcards: parsed.flashcards };
-    } catch (e) { return { flashcards: mock.flashcards }; }
+    } catch { return { flashcards: mock.flashcards }; }
 }

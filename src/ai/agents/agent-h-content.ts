@@ -1,4 +1,4 @@
-import { LearningState } from "@/types/learning-state";
+import { LearningState, ExternalResource } from "@/types/learning-state";
 import { generateWithFallback } from "@/lib/gemini";
 
 export async function agent_h_content_generator(state: LearningState): Promise<Partial<LearningState>> {
@@ -17,8 +17,8 @@ export async function agent_h_content_generator(state: LearningState): Promise<P
                 {"front": "Question/Term", "back": "Answer/Definition"}
               ],
               "cheat_sheet": [
-                "Key boolean point 1",
-                "Key boolean point 2"
+                "Key bullet point 1",
+                "Key bullet point 2"
               ],
               "analogy_content": {
                 "analogy": "The analogy statement...",
@@ -59,7 +59,7 @@ export async function agent_h_content_generator(state: LearningState): Promise<P
         },
         external_resources: [
             { type: "link", title: "Official Documentation", url: "https://cloud.google.com", description: "Learn more here." }
-        ] as any
+        ] as ExternalResource[]
     };
 
     try {

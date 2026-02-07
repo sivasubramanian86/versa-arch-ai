@@ -30,5 +30,5 @@ export async function agent_h5_pareto(state: LearningState): Promise<Partial<Lea
     try {
         const parsed = await generateWithFallback({ agentName: "H5", systemInstruction, userPrompt, mockResponse: mock });
         return { pareto_digest: parsed.pareto_digest };
-    } catch (e) { return { pareto_digest: mock.pareto_digest }; }
+    } catch { return { pareto_digest: mock.pareto_digest }; }
 }

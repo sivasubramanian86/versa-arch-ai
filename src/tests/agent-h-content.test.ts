@@ -10,6 +10,7 @@ describe('Agent H: Content Generator', () => {
             learner_profile: {
                 skill_level: 50,
                 learning_style: "visual",
+                pace: "standard",
                 time_budget: 15,
                 goal: "Understand",
                 learning_history: [],
@@ -18,9 +19,11 @@ describe('Agent H: Content Generator', () => {
             },
             personalized_path: {
                 recommended_topic: "Cloud Object Storage",
+                difficulty_level: 5,
+                traditional_duration_estimate: 45,
                 learning_sequence: [],
                 estimated_duration: 15,
-                blooms_level: "understand"
+                time_saved_rationale: "AI optimization"
             },
             retrieved_knowledge: [
                 { source: "Docs", concept: "Buckets", explanation: "Containers for objects", credibility: 0.9, last_updated: "2024-01-01" }
@@ -54,6 +57,7 @@ describe('Agent H: Content Generator', () => {
             learner_profile: {
                 skill_level: 0,
                 learning_style: "verbal",
+                pace: "standard",
                 time_budget: 0,
                 goal: "Learn",
                 learning_history: [],
@@ -76,6 +80,7 @@ describe('Agent H: Content Generator', () => {
             learner_profile: {
                 skill_level: 50,
                 learning_style: "visual",
+                pace: "standard",
                 time_budget: 15,
                 goal: "Deepen",
                 learning_history: [],

@@ -61,7 +61,7 @@ Our architecture utilizes specialized agents for complex reasoning tasks, execut
     *   **H4 (Resources)**: Curated external links/books.
     *   **H5 (Pareto Digest)**: 80/20 Principle analysis.
     *   **H6 (Quiz Generator)**: Scenario-based micro-assessments.
-    *   **H7 (Infographics)**: "Nano Banana" generative visuals.
+    *   **H7 (Infographics)**: "Nano Banana" generative visuals powered by **Google Cloud Vertex AI (Imagen 2)** with semantic fallback.
     *   **H8 (Mnemonics)**: Creative memory aids and acronyms.
 
 ### 3. **The Real-Time Teacher Flow**
@@ -80,7 +80,7 @@ Our architecture utilizes specialized agents for complex reasoning tasks, execut
 | **LLM Backend** | Gemini 3 Pro & Flash | Primary reasoning with robust fallback and mock support. |
 | **Orchestration** | LangGraph.js | Stateful, multi-actor agent management |
 | **Frontend** | Next.js 14 (App Router) | SSR Stability & specialized routing hooks |
-| **Visuals** | React Flow | Interactive architecture graphing |
+| **Visuals** | React Flow & Vertex AI Imagen | Interactive architecture graphing & Generative Infographics |
 | **Styling** | Tailwind CSS + Framer Motion | Premium glassmorphic "Vibe Engineering" |
 | **State** | Zustand | Real-time UI theme and state synchronization |
 
@@ -90,7 +90,7 @@ Our architecture utilizes specialized agents for complex reasoning tasks, execut
 
 ### **General Questions**
 **Q: How is this different from a normal RAG chatbot?**
-A: Most RAG bots just retrieve text. VersaArch AI **orchestrates agents** to redraw diagrams, build prerequisite trees, and create scenario-based quizing environments. It reasons over the *structure* of data, not just the keywords.
+A: Most RAG bots just retrieve text. VersaArch AI **orchestrates agents** to redraw diagrams, build prerequisite trees, and create scenario-based quizzing environments. It reasons over the *structure* of data, not just the keywords.
 
 **Q: Can I use it for non-technical topics?**
 A: While optimized for "Systems Thinking" (Coding, Cloud, Engineering), the engine can dissect any logical structure, including history timelines or biological processes.
@@ -111,6 +111,10 @@ A: This usually means a previous Node process is stuck.
 1.  Open Terminal.
 2.  Run: `taskkill /F /IM node.exe` (Windows) or `pkill -f node` (Mac/Linux).
 3.  Restart: `npm run dev`.
+
+### **Testing**
+**Q: How do I run the test suite?**
+A: We use **Vitest**. Run `npm run test` (or `npx vitest run src/tests`) to execute the full suite. All tests are consolidated in the `src/tests` directory.
 
 ---
 

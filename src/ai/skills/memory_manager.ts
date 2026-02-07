@@ -20,13 +20,13 @@ export const memoryManager = {
     storeInsight: async (state: LearningState, text: string, tags: string[] = []): Promise<void> => {
         console.log(`[Skill:Memory] Storing insight: "${text}" [${tags.join(", ")}]`);
 
-        const entry: MemoryEntry = {
-            id: generateId(),
-            timestamp: Date.now(),
-            text,
-            tags,
-            importance: 0.8 // default high importance for explicit insights
-        };
+        // const entry: MemoryEntry = {
+        //     id: generateId(),
+        //     timestamp: Date.now(),
+        //     text,
+        //     tags,
+        //     importance: 0.8 // default high importance for explicit insights
+        // };
 
         // In a real app, this would be: await VectorDB.upsert(entry);
         // Here, we just log it. The state graph accumulates it in 'long_term_memory' channel automatically
@@ -43,7 +43,7 @@ export const memoryManager = {
         // Mock retrieval logic 
         // In real app: await VectorDB.query(query);
 
-        const memories = (state.long_term_memory as any)?.entries || [];
+        const memories = (state.long_term_memory as { entries: MemoryEntry[] })?.entries || [];
         if (!memories.length) return [];
 
         // Simple keyword match for hackathon
@@ -55,6 +55,8 @@ export const memoryManager = {
     }
 };
 
+/*
 function generateId(): string {
     return Math.random().toString(36).substring(2, 15);
 }
+*/

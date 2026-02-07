@@ -17,5 +17,5 @@ export async function agent_h3_cheatsheet(state: LearningState): Promise<Partial
     try {
         const parsed = await generateWithFallback({ agentName: "H3", systemInstruction, userPrompt, mockResponse: mock });
         return { cheat_sheet: parsed.cheat_sheet };
-    } catch (e) { return { cheat_sheet: mock.cheat_sheet }; }
+    } catch { return { cheat_sheet: mock.cheat_sheet }; }
 }

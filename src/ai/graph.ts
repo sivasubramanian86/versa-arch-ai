@@ -106,18 +106,56 @@ graph.addNode("feedback", agent_g_feedback_engine as any);
 graph.addEdge(START, "intent_classifier");
 
 // Conditional Routing Logic
-function routeFromIntent(state: LearningState) {
+export function routeFromIntent(state: LearningState) {
     const intent = state.detected_intent;
 
-    // Logic matches the Architecture Protocol
+    // DYNAMIC ROUTING: If Agent A specified activated agents, use them!
+    if (state.activated_agents && state.activated_agents.length > 0) {
+        // Filter out "feedback" from parallel execution if it's meant to be sequential, 
+        // OR just return the whole list if standard graph lets them run.
+        // LangGraph conditional edge returns a list of *Node Names* to run next.
+        // We must ensure these names exist in the graph.
+        // Note: We filter "feedback" because it's usually wired after the parallel block.
+        // But wait, if I return ["h1", "feedback"], they run in parallel?
+        // In my graph structure, "feedback" is AFTER the parallel block?
+        // Let's check the edges.
+        // I have: intent_classifier -> [conditional]
+        // And: [parallelNodes] -> evaluator -> feedback
+        // So if I return "h1", h1 runs, then h1 -> evaluator -> feedback.
+        // If I return "feedback" directly, it runs parallel to h1 ??
+        // Actually, if "feedback" is in the list from 'intent_classifier', it runs immediately.
+        // But "feedback" is also downstream of "h1".
+        // Use case: "Generate just infographic".
+        // activated_agents = ["h7_infographic"]
+        // route returns ["h7_infographic"].
+        // h7 runs. h7 -> evaluator -> feedback.
+        // Perfect.
+
+        // What if activated_agents = ["feedback"]? (e.g. just chat)
+        // route returns ["feedback"]. feedback runs. feedback -> END.
+        // Perfect.
+
+        // So I should return everything EXCEPT "feedback" if "feedback" is also downstream?
+        // If I return ["h7", "feedback"], h7 and feedback run parallel.
+        // Then h7 -> evaluator -> feedback runs AGAIN.
+        // So yes, I should filter "feedback" out of the parallel start list IF there are other nodes.
+        const parallelNodes = state.activated_agents.filter(a => a !== "feedback" && a !== "evaluator");
+        if (parallelNodes.length > 0) {
+            return parallelNodes;
+        }
+        // If only feedback/evaluator is left, return them.
+        return state.activated_agents;
+    }
+
+    // Fallback (Logic matches the Architecture Protocol)
     switch (intent) {
         case "VISUALIZE":
-            return ["visualizer"]; // Will flow to evaluator -> feedback
+            return ["visualizer", "h7_infographic"]; // Will flow to evaluator -> feedback
         case "UNDERSTAND":
             return [
                 "scaffolder", "personalization", "knowledge_manager", // Cognitive
                 "visualizer", // Visual
-                "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "h8_mnemonic" // Content
+                "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "h8_mnemonic", "h7_infographic" // Content
             ];
         case "EVALUATE":
             return ["evaluator"];
@@ -157,15 +195,23 @@ graph.addConditionalEdges(
     }
 );
 
-// Define downstream flows (Converging on Evaluator/Feedback)
+// Define downstream flows
+// We allow all agents to run in parallel and stream their results independently.
+// The client aggregates the state.
 
-// VISUALIZE Path: intent -> visualizer -> evaluator -> feedback
+// Visualizer Path: intent -> visualizer -> evaluator -> feedback
 // @ts-ignore
 graph.addEdge("visualizer", "evaluator");
 
-// All nodes eventually flow to evaluator (or directly to end if we want streaming to be the main output)
-// For now, let's have them all point to evaluator to aggregate score, then feedback.
+// Evaluator -> Feedback
+// @ts-ignore
+graph.addEdge("evaluator", "feedback");
 
+// Feedback -> END
+// @ts-ignore
+graph.addEdge("feedback", END);
+
+// Parallel Content Nodes
 const parallelNodes = [
     "scaffolder", "personalization", "knowledge_manager",
     "h1_analogy", "h2_flashcards", "h3_cheatsheet", "h4_resources", "h5_pareto", "h6_quiz", "h8_mnemonic", "h7_infographic"
@@ -175,67 +221,6 @@ parallelNodes.forEach(node => {
     // @ts-ignore
     graph.addEdge(node, "evaluator");
 });
-
-// Detect race condition? Evaluator runs when ANY or ALL finish?
-// LangGraph default is wait for ALL predecessors? No, it's state based.
-// If multiple nodes point to Evaluator, Evaluator might run multiple times?
-// OR we need a barrier/join node.
-// LangGraph StateGraph usually runs nodes when their inputs are ready. 
-// If Conditional Edge points to [A, B, C], they run in parallel.
-// If A, B, C all point to D, D runs... once? or 3 times?
-// Default behavior: It waits for the "Superstep" to complete?
-// Actually, to keep it simple and avoid evaluator spam, we can just let them END or self-loop?
-// But we need Evaluator to calculate score.
-// Let's point them to "feedback" or END, and rely on client-side state merging.
-// But Evaluator needs to see the content to quiz on it?
-// Evaluator runs independently in the "UNDERSTAND" list? No, it wasn't in the list?
-// Wait, I should add "evaluator" to the UNDERSTAND list if I want it to run parallel too!
-// Yes! "evaluator" is independent.
-// So I will REMOVE the edges from Hx to Evaluator.
-// ALL agents run in parallel.
-// Then they ALL merge state.
-// Who runs last? Feedback?
-// Feedback needs summary.
-// Let's make "feedback" depend on "personalization" or just run parallel too?
-// If everything is parallel, feedback might run before content is ready.
-// Feedback generates "Next Steps".
-// Let's chain Feedback AFTER the parallel block.
-// But LangGraph doesn't have a "Barrier" node easily unless I define one.
-// "evaluator" can be the barrier?
-// Let's set edges: [All Parallel Nodes] -> "feedback".
-// Does LangGraph wait for all?
-// If I use a standard graph, multiple incoming edges usually trigger multiple executions unless synchronized?
-// USE CASE: "Fan-Out, Fan-In".
-// StateGraph: If multiple nodes are returned by conditional edge, they run parallel.
-// If they all point to "feedback", "feedback" will run after... the step?
-// I will assume LangGraph handles Fan-In synchronization or runs Feedback multiple times (which is okay, last one wins).
-// Better: Add "evaluator" to the parallel list.
-// And point EVERYONE to "feedback".
-// Or just point "personalizer" to "feedback" as a trigger?
-// Let's point ALL to separate END?
-// Client merges state.
-// Feedback is just another agent!
-// Add "evaluator" and "feedback" to the PARALLEL list in `routeFromIntent`.
-// REMOVE explicit edges between them for the parallel group.
-// AND add specific edges for sequential flows if needed (e.g. Visualize -> Evaluator).
-// But for UNDERSTAND, max parallel is best.
-// I will update the `parallelNodes` logic to just be:
-// graph.addEdge("scaffolder", END); ... etc.
-// But "feedback" usually wraps things up.
-// I'll stick to: All Parallel -> END.
-// The UI streams updates. The "Final State" is the merged result.
-
-// REVISING Replacement:
-// Remove edges.
-// Add edges to END.
-
-// EVALUATE Path: intent -> evaluator -> feedback
-// @ts-ignore
-graph.addEdge("evaluator", "feedback");
-
-// FEEDBACK Path: feedback -> END
-// @ts-ignore
-graph.addEdge("feedback", END);
 
 // Compile the graph
 export const learningGraph = graph.compile();

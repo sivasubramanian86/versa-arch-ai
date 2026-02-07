@@ -8,31 +8,12 @@ import { extractFromSource } from "@/lib/dissector";
 import { createStreamableValue } from "@ai-sdk/rsc";
 
 // Server Action to run the graph
+// Server Action to run the graph
 export async function runLearningGraph(
     input: string,
     profile: unknown,
     previousState?: Partial<LearningState>
 ) {
-
-    // Check for source dissection triggers
-    const sourceData = await extractFromSource(input);
-
-    const initialState: Partial<LearningState> = {
-        ...(previousState || {}),
-        learner_input: input,
-        learner_profile: profile as any,
-        domain: sourceData.text ? sourceData.metadata.title : (previousState?.domain || "Cloud Architecture"),
-        messages: [...(previousState?.messages || []), { role: "user", content: input }],
-        routing_log: [...(previousState?.routing_log || [])],
-        source_context: sourceData.text || previousState?.source_context,
-        source_metadata: (sourceData.text ? sourceData.metadata : undefined) || previousState?.source_metadata
-    };
-
-    // Environment check (logging only, agents handle fallback)
-    if (!process.env.GEMINI_API_KEY) {
-        console.warn("WARNING: GEMINI_API_KEY is not set. Agents will use internal mocks.");
-    }
-
     // Use createStreamableValue to stream progress updates AND partial data to the client
     const progressStream = createStreamableValue<{
         agent: string;
@@ -43,19 +24,55 @@ export async function runLearningGraph(
 
     (async () => {
         try {
+            // Send initial ping to wake up the UI
+            progressStream.update({ agent: "System", status: "Initializing..." });
+
+            // Check for source dissection triggers (Async now!)
+            let sourceData: { text: string; metadata: { type: "book" | "video" | "audio" | "article"; title: string; url?: string } } =
+                { text: "", metadata: { type: "article", title: "", url: "" } };
+            try {
+                // Update status for potentially slow operation
+                progressStream.update({ agent: "System", status: "Analyzing Source..." });
+                sourceData = await extractFromSource(input);
+            } catch (e) {
+                console.warn("Dissection failed, proceeding without source context", e);
+            }
+
+            const initialState: Partial<LearningState> = {
+                ...(previousState || {}),
+                learner_input: input,
+                learner_profile: profile as any,
+                domain: sourceData.text ? sourceData.metadata.title : (previousState?.domain || "Cloud Architecture"),
+                messages: [...(previousState?.messages || []), { role: "user", content: input }],
+                routing_log: [...(previousState?.routing_log || [])],
+                source_context: sourceData.text || previousState?.source_context,
+                source_metadata: (JSON.stringify(sourceData.metadata) !== JSON.stringify({ title: "", url: "" }) ? sourceData.metadata : undefined) || previousState?.source_metadata
+            };
+
+            // Environment check (logging only, agents handle fallback)
+            if (!process.env.GEMINI_API_KEY) {
+                console.warn("WARNING: GEMINI_API_KEY is not set. Agents will use internal mocks.");
+            }
+
             // Use .stream() instead of .invoke() to get intermediate steps
+            // streamMode: "updates" emits as soon as a node finishes
             const stream = await learningGraph.stream(initialState, {
                 streamMode: "updates",
             });
 
+            // Start with initial state
+            let accumulatedState = { ...initialState } as LearningState;
+
             for await (const chunk of stream as any) {
                 // Chunk keys correspond to the node names that just finished
-                // e.g., { intent_classifier: { ... } }
                 for (const nodeName of Object.keys(chunk)) {
                     let displayName = "Processing...";
                     let status = "Working";
                     // Extract the output state from this node to stream partially
                     const partialData = chunk[nodeName];
+
+                    // Simple accumulation for the final signal (approximation)
+                    accumulatedState = { ...accumulatedState, ...partialData };
 
                     switch (nodeName) {
                         case "intent_classifier": displayName = "Agent A: Classifying Intent"; status = "Analyzing"; break;
@@ -86,25 +103,8 @@ export async function runLearningGraph(
                 }
             }
 
-            // Get final state for the return value
-            // (We re-run invoke or just trust the last chunk? Stream usually gives partials. 
-            // Better to capture the final accumulated state if possible, or just let the client reload/wait.
-            // For simplicity in this architecture, we will return the final object via the stream or 
-            // separate the concerns. 
-            // APPROACH: The client will receive the *final state* as the resolution of the promise, 
-            // but we can't easily return both a stream and a promise in the same Server Action return type 
-            // without using the specific AI SDK patterns.
-
-            // Standard Pattern: Return object containing the stream and the final result promise
-            // But runLearningGraph currently returns Promise<Partial<LearningState>>.
-            // We'll change the return type to include the stream.
-
-            // Since we need the Final State for the UI to render, let's do a full invoke *after* or 
-            // concurrently? No, that's wasteful.
-            // efficient way: maintain state accumulator.
-
-            const finalState = await learningGraph.invoke(initialState);
-            progressStream.done({ agent: "Complete", status: "Done", finalState: finalState as any });
+            // Ensure done() is ALWAYS called to close the stream successfully
+            progressStream.done({ agent: "Complete", status: "Done", finalState: accumulatedState });
 
         } catch (error) {
             console.error("Streaming Error:", error);

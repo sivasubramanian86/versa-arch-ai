@@ -3,7 +3,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-import { InfographicView } from '../infographic-view';
+import { InfographicView } from '@/components/ui/infographic-view';
 
 describe('InfographicView', () => {
     const mockOnLoadMore = vi.fn();
@@ -24,7 +24,7 @@ describe('InfographicView', () => {
     it('renders fallback summary when no image is present', () => {
         render(<InfographicView state={baseState} onLoadMore={mockOnLoadMore} />);
 
-        expect(screen.getByText(/Concept Overview/i)).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /Test Topic/i, level: 3 })).toBeInTheDocument();
         expect(screen.getByText(/Generate Visual Infographic/i)).toBeInTheDocument();
         // Check for default fallback bullet
         expect(screen.getByText(/Decomposing system architecture/i)).toBeInTheDocument();
@@ -54,9 +54,11 @@ describe('InfographicView', () => {
         render(<InfographicView state={stateWithImage} onLoadMore={mockOnLoadMore} />);
 
         const img = screen.getByAltText('Test Alt Text') as HTMLImageElement;
-        expect(img.src).toContain('https://example.com/real-image.png');
-        expect(screen.getByText(/Download/i)).toBeDefined();
-        expect(screen.getByText(/Regenerate/i)).toBeDefined();
+        expect(decodeURIComponent(img.src)).toContain('https://example.com/real-image.png');
+        expect(screen.getByText(/Download/i)).toBeInTheDocument();
+        // There might be multiple "Regenerate" buttons (header and footer), so we check if at least one exists
+        const regenerateButtons = screen.getAllByText(/Regenerate/i);
+        expect(regenerateButtons.length).toBeGreaterThan(0);
     });
 
     it('calls onLoadMore when generate button is clicked', () => {

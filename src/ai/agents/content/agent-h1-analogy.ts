@@ -27,5 +27,5 @@ export async function agent_h1_analogy(state: LearningState): Promise<Partial<Le
         await memoryManager.storeInsight(state, `Used analogy for ${topic}: ${parsed.analogy_content.analogy}`, ["analogy", topic]);
 
         return { analogy_content: parsed.analogy_content };
-    } catch (e) { return { analogy_content: mock.analogy_content }; }
+    } catch { return { analogy_content: mock.analogy_content }; }
 }

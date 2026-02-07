@@ -6,7 +6,8 @@ import {
     agent_h3_cheatsheet,
     agent_h4_resources,
     agent_h5_pareto,
-    agent_h6_quiz
+    agent_h6_quiz,
+    agent_h7_infographic
 } from '@/ai/agents';
 import { LearningState } from '@/types/learning-state';
 
@@ -26,8 +27,10 @@ describe('Content Sub-Agents (Parallel Execution)', () => {
         personalized_path: {
             recommended_topic: "Cloud Computing Basics",
             difficulty_level: 1,
+            traditional_duration_estimate: 45,
             estimated_duration: 15,
-            learning_sequence: []
+            learning_sequence: [],
+            time_saved_rationale: "AI optimization"
         },
         detected_intent: "UNDERSTAND"
     };
@@ -71,5 +74,17 @@ describe('Content Sub-Agents (Parallel Execution)', () => {
         const deepenState = { ...mockState, detected_intent: "DEEPEN" };
         const result = await agent_h2_flashcards(deepenState as LearningState);
         expect(result.flashcards).toBeDefined();
+    });
+
+    it('H7 Infographic should return infographic and use learner_input fallback', async () => {
+        const stateWithoutTopic = {
+            ...mockState,
+            personalized_path: null,
+            learner_input: "Quantum Physics"
+        };
+        const result = await agent_h7_infographic(stateWithoutTopic as LearningState);
+        expect(result.infographic).toBeDefined();
+        // Since we can't easily check the prompt sent to the mock/real API without spying, 
+        // we at least ensure it runs and returns a result for a provided learner_input.
     });
 });

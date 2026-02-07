@@ -183,12 +183,12 @@ export default function Home() {
       {/* Footer / Status Bar */}
       <footer className="fixed bottom-0 inset-x-0 h-10 bg-background/80 backdrop-blur-md border-t border-foreground/5 flex items-center justify-between px-6 text-[10px] text-foreground/40 z-50">
         <div className="flex items-center gap-4">
-          <span>Powered by Gemini 3.0 Flash Thinking</span>
+          <span>Powered by Gemini 3 Flash Thinking</span>
           <span className="hidden md:inline text-foreground/10">|</span>
           <span className="hidden md:inline">Latency: ~4.2s</span>
         </div>
         <div>
-          VersaArch AI v0.9 (Beta)
+          VersaArch AI v1.0.4 (Beta)
         </div>
       </footer>
     </div>

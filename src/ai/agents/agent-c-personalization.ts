@@ -4,7 +4,7 @@ import { generateWithFallback } from "@/lib/gemini";
 export async function agent_c_personalization_engine(state: LearningState): Promise<Partial<LearningState>> {
     console.log("Agent C: Personalizing Path with Gemini 3 Fallback...");
 
-    const topic = state.learner_input;
+    // const topic = state.learner_input;
 
     const systemInstruction = `
             You are the Personalization Engine. Your job is to recommend a learning path

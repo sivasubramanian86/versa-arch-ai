@@ -1,5 +1,5 @@
 
-import { LearningState } from "@/types/learning-state";
+import { LearningState, ExternalResource } from "@/types/learning-state";
 import { generateWithFallback } from "@/lib/gemini";
 
 export async function agent_h4_resources(state: LearningState): Promise<Partial<LearningState>> {
@@ -12,14 +12,12 @@ export async function agent_h4_resources(state: LearningState): Promise<Partial<
     `;
     const userPrompt = `Topic: ${topic}.`;
 
-    const mock = { external_resources: [{ type: "link", title: "Docs", url: "https://example.com", description: "Ref" }] };
+    const mock = { external_resources: [{ type: "link", title: "Docs", url: "https://example.com", description: "Ref" }] as ExternalResource[] };
 
     try {
-        const parsed = await generateWithFallback({ agentName: "H4", systemInstruction, userPrompt, mockResponse: mock });
-        // @ts-ignore
+        const parsed = await generateWithFallback({ agentName: "H4", systemInstruction, userPrompt, mockResponse: mock }) as { external_resources: ExternalResource[] };
         return { external_resources: parsed.external_resources };
-    } catch (e) {
-        // @ts-ignore
+    } catch {
         return { external_resources: mock.external_resources };
     }
 }

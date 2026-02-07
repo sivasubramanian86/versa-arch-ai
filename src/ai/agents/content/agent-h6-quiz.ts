@@ -23,16 +23,14 @@ export async function agent_h6_quiz(state: LearningState): Promise<Partial<Learn
             options: ["Yes", "No"],
             answer: "Yes",
             explanation: "Because.",
-            type: "mcq"
+            type: "mcq" as const
         }]
     };
 
     try {
-        const parsed = await generateWithFallback({ agentName: "H6", systemInstruction, userPrompt, mockResponse: mock });
-        // @ts-ignore
+        const parsed = await generateWithFallback({ agentName: "H6", systemInstruction, userPrompt, mockResponse: mock }) as { practice_quiz: LearningState["practice_quiz"] };
         return { practice_quiz: parsed.practice_quiz };
-    } catch (e) {
-        // @ts-ignore
+    } catch {
         return { practice_quiz: mock.practice_quiz };
     }
 }

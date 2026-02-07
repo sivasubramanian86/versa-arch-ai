@@ -9,7 +9,7 @@ export const maxDuration = 60;
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "VERSA ARCH AI - Gemini Agentic Learning",
+  title: "VersaArch AI - Gemini Agentic Learning",
   description: "Personalized learning with generative system diagrams and reasoning.",
 };
 

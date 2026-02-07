@@ -202,12 +202,21 @@ function AnalogyView({ state, onLoadMore }: { state: LearningState, onLoadMore?:
     const content = state.analogy_content;
 
     return (
-        <div className="p-8 max-w-2xl mx-auto">
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20">
-                <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+        <div className="p-8 max-w-2xl mx-auto h-full overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                     <Sparkles className="text-purple-400" />
                     Analogy Mode
                 </h3>
+                <button
+                    onClick={() => onLoadMore && onLoadMore("analogy")}
+                    className="px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    Generate New Analogy
+                </button>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20">
                 {content ? (
                     <div className="space-y-6">
                         <p className="text-xl font-medium text-foreground">{content.analogy}</p>
@@ -220,15 +229,6 @@ function AnalogyView({ state, onLoadMore }: { state: LearningState, onLoadMore?:
                         <span className="text-sm text-foreground/40 mt-2 block">(No specific analogy generated for this session)</span>
                     </p>
                 )}
-            </div>
-
-            <div className="mt-8 flex justify-center">
-                <button
-                    onClick={() => onLoadMore && onLoadMore("analogy")}
-                    className="px-6 py-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
-                >
-                    Generate New Analogy
-                </button>
             </div>
         </div>
     )
@@ -257,19 +257,26 @@ function FlashcardView({ state, onLoadMore }: { state: LearningState, onLoadMore
     const currentCard = flashcards[currentIndex];
 
     return (
-        <div className="p-8 flex flex-col items-center justify-center h-full max-w-2xl mx-auto">
-            <div className="w-full flex justify-between items-center mb-8">
+        <div className="p-8 flex flex-col items-center h-full max-w-2xl mx-auto overflow-y-auto">
+            <div className="w-full flex justify-between items-center mb-8 shrink-0">
                 <h3 className="text-xl font-bold flex items-center gap-2">
                     <Play className="w-5 h-5 text-gemini-primary" />
                     Review Cards
                 </h3>
-                <span className="text-sm text-foreground/40 font-mono">
-                    {currentIndex + 1} / {flashcards.length}
-                </span>
+                <button
+                    onClick={() => onLoadMore && onLoadMore()}
+                    className="px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    Regenerate Deck
+                </button>
+            </div>
+
+            <div className="w-full text-center text-sm text-foreground/40 font-mono mb-4">
+                Card {currentIndex + 1} of {flashcards.length}
             </div>
 
             <div
-                className="w-full aspect-[4/3] relative perspective-1000 group cursor-pointer"
+                className="w-full aspect-[4/3] relative perspective-1000 group cursor-pointer shrink-0"
                 onClick={() => setIsFlipped(!isFlipped)}
             >
                 <div className={clsx(
@@ -298,20 +305,13 @@ function FlashcardView({ state, onLoadMore }: { state: LearningState, onLoadMore
                 </div>
             </div>
 
-            <div className="flex gap-4 mt-12 w-full">
+            <div className="flex gap-4 mt-12 w-full shrink-0 pb-8">
                 <button
                     disabled={currentIndex === 0}
                     onClick={(e) => { e.stopPropagation(); setCurrentIndex(i => i - 1); setIsFlipped(false); }}
                     className="flex-1 py-4 rounded-2xl bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 text-foreground font-medium transition-all disabled:opacity-20 disabled:cursor-not-allowed"
                 >
                     Previous
-                </button>
-
-                <button
-                    onClick={() => onLoadMore && onLoadMore()}
-                    className="px-6 rounded-2xl bg-foreground/5 hover:bg-foreground/10 text-foreground font-medium transition-all"
-                >
-                    Load More
                 </button>
 
                 <button
@@ -330,10 +330,18 @@ function CheatSheetView({ state, onLoadMore }: { state: LearningState, onLoadMor
     const items = state.cheat_sheet || ["No cheat sheet available."];
     return (
         <div className="p-8 max-w-3xl mx-auto overflow-y-auto h-full">
-            <h3 className="text-2xl font-bold mb-6 text-foreground flex items-center gap-2">
-                <FileText className="w-6 h-6 text-gemini-secondary" />
-                Cheat Sheet
-            </h3>
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                    <FileText className="w-6 h-6 text-gemini-secondary" />
+                    Cheat Sheet
+                </h3>
+                <button
+                    onClick={onLoadMore}
+                    className="px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    Expand Cheat Sheet
+                </button>
+            </div>
             <div className="space-y-4">
                 {items.map((item, i) => (
                     <div key={i} className="flex gap-4 p-4 rounded-xl bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 transition-colors">
@@ -345,45 +353,49 @@ function CheatSheetView({ state, onLoadMore }: { state: LearningState, onLoadMor
                     </div>
                 ))}
             </div>
-            <div className="mt-8 text-center">
-                <button
-                    onClick={onLoadMore}
-                    className="px-6 py-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
-                >
-                    Expand Cheat Sheet
-                </button>
-            </div>
         </div>
     )
 }
 
 function MemoryMapView({ state }: { state: LearningState }) {
     // Simulating a "Video" or animated recall view using CSS animations
+    const [replayKey, setReplayKey] = useState(0);
+
     return (
-        <div className="flex flex-col items-center justify-center h-full p-8 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gemini-secondary/20 via-transparent to-transparent animate-pulse" />
+        <div className="flex flex-col items-center h-full p-8 text-center relative overflow-y-auto overflow-x-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gemini-secondary/20 via-transparent to-transparent animate-pulse pointer-events-none" />
 
-            <h3 className="text-2xl font-bold mb-8 relative z-10 text-foreground">Mental Recall Map</h3>
-
-            <div className="relative z-10 grid gap-8 max-w-2xl w-full">
-                {state.personalized_path?.learning_sequence?.slice(0, 4).map((step, i) => (
-                    <div
-                        key={i}
-                        className="p-6 rounded-2xl bg-background border border-foreground/10 backdrop-blur-xl shadow-xl transform transition-all duration-1000"
-                        style={{
-                            animation: `fade-in-up 0.5s ease-out ${i * 1.5}s backwards`, // Staggered animation
-                        }}
-                    >
-                        <div className="text-sm text-foreground/40 uppercase tracking-widest mb-1">Step {i + 1}</div>
-                        <div className="text-xl font-medium text-foreground">{step}</div>
-                    </div>
-                ))}
+            <div className="flex items-center justify-between w-full max-w-2xl mb-8 relative z-10 shrink-0">
+                <h3 className="text-2xl font-bold text-foreground">Mental Recall Map</h3>
+                <button
+                    onClick={() => setReplayKey(prev => prev + 1)}
+                    className="px-4 py-2 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground font-medium transition-colors flex items-center gap-2"
+                >
+                    <BrainCircuit className="w-4 h-4" />
+                    Replay
+                </button>
             </div>
 
-            <button className="mt-12 px-6 py-3 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground font-medium transition-colors flex items-center gap-2 relative z-10">
-                <BrainCircuit className="w-5 h-5" />
-                Replay Visualization
-            </button>
+            <div key={replayKey} className="relative z-10 grid gap-8 max-w-2xl w-full pb-12">
+                {!state.personalized_path?.learning_sequence ? (
+                    <div className="p-8 text-foreground/40 animate-pulse">
+                        Generative recall sequence...
+                    </div>
+                ) : (
+                    state.personalized_path!.learning_sequence.slice(0, 4).map((step, i) => (
+                        <div
+                            key={i}
+                            className="p-6 rounded-2xl bg-background border border-foreground/10 backdrop-blur-xl shadow-xl transform transition-all duration-1000"
+                            style={{
+                                animation: `fade-in-up 0.5s ease-out ${i * 1.5}s backwards`, // Staggered animation
+                            }}
+                        >
+                            <div className="text-sm text-foreground/40 uppercase tracking-widest mb-1">Step {i + 1}</div>
+                            <div className="text-xl font-medium text-foreground">{step}</div>
+                        </div>
+                    ))
+                )}
+            </div>
         </div>
     )
 }
@@ -705,11 +717,20 @@ function ParetoView({ state, onLoadMore }: { state: LearningState, onLoadMore?: 
 
     return (
         <div className="p-8 max-w-3xl mx-auto h-full overflow-y-auto">
-            <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
-                <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-2">
+            <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                     <Sparkles className="text-emerald-500" />
                     The 80/20 Principle
                 </h3>
+                <button
+                    onClick={() => onLoadMore && onLoadMore()}
+                    className="px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
+                >
+                    Deepen Analysis
+                </button>
+            </div>
+
+            <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
                 <p className="text-lg font-medium text-foreground/90">{data.principle}</p>
             </div>
 
@@ -737,15 +758,6 @@ function ParetoView({ state, onLoadMore }: { state: LearningState, onLoadMore?: 
                         {data.outcome_80_percent}
                     </p>
                 </div>
-            </div>
-
-            <div className="mt-8 text-center">
-                <button
-                    onClick={() => onLoadMore && onLoadMore()}
-                    className="px-6 py-2 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground/60 transition-colors text-sm"
-                >
-                    Deepen Analysis
-                </button>
             </div>
         </div>
     )
