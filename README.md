@@ -1,3 +1,8 @@
+> [!NOTE]
+> **OFFICIAL PORTFOLIO SHOWCASE BY SIVASUBRAMANIAN**  
+> **Original Author:** [Sivasubramanian](https://github.com/sivasubramanian86)  
+> *This repository is an open portfolio showcase. Unauthorized cloning, re-hosting, or submission to hackathons/competitions under another name is strictly prohibited.*
+
 # Versa Arch AI - The Real-Time System Teacher 🧠✨
 
 > **Built for the Gemini 3 Global Hackathon: Transitioning from Static Chat to Autonomous Agentic Orchestration.**
